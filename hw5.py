@@ -70,6 +70,7 @@ ACCESS_TYPE = {
 }
 
 def populate_programmable_options(options):
+  global options
   options.C = humanfriendly.parse_size(options.C, binary=True)
   options.L = humanfriendly.parse_size(options.L, binary=True)
   options.C = int(options.C)
