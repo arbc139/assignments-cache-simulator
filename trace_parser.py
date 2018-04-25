@@ -1,5 +1,5 @@
 
-from gmpy2 import xmpz
+from gmpy2 import mpz
 
 def parse(trace_file):
   result = []
@@ -9,6 +9,6 @@ def parse(trace_file):
     if not line: break
     result.append({
       'type': int(tokenized_line[0]),
-      'address': xmpz(int(tokenized_line[1], 16)).setbit(64),
+      'address': mpz(int(tokenized_line[1], 16)).setbit(64),
     })
   return result
