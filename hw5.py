@@ -74,11 +74,12 @@ def populate_output_file_label(input_label):
   return '%s_results.csv' % input_label
 
 def run_all():
-  input_labels = ['Trace1', 'Trace2']
+  input_labels = ['Trace1']
 
   # TODO(totoro): Needs to parse configs JSON file.
 
   for input_label in input_labels:
+    print('INPUT:', input_label)
     input_file = INPUT_FOLDER_PATH + input_label
 
     # Parse trace file to programmable.
