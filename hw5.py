@@ -108,6 +108,8 @@ def run_all():
   with open('configs.json', 'r') as raw_config_file:
     raw_configs = json.load(raw_config_file)
   check_raw_configs(raw_configs)
+  print('No Problem')
+  return
 
   for input_label in input_labels:
     print('INPUT:', input_label)
