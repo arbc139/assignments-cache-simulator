@@ -136,7 +136,7 @@ def run_hw5():
   print(parsed_traces[:10])
 
   ## Step 2. Run simulator
-  simulation_result = simulate_hw5(parsed_traces, cache)
+  simulation_result = simulate(parsed_traces, cache)
   print(simulation_result)
 
   ## Step 3. Print out result file as CSV
@@ -149,7 +149,7 @@ def run_hw5():
     })
   """
 
-def simulate_hw5(parsed_traces, cache):
+def simulate(parsed_traces, cache):
   result = {
     'hit': 0,
     'miss': 0,
@@ -192,7 +192,7 @@ def simulate_hw5(parsed_traces, cache):
       continue
 
     # Evicts random victim
-    victim_k_index = random.randrange(0, options.K - 1)
+    victim_k_index = random.randrange(0, options['K'] - 1)
     cache[cache_index][victim_k_index].valid = True
     cache[cache_index][victim_k_index].tag = cache_tag
 
