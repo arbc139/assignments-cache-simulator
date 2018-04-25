@@ -161,9 +161,12 @@ def simulate_hw5(parsed_traces, cache):
     result['access_count'] += 1
 
     address = trace['address']
-    print('address:', address)
-    cache_index = ((address << CACHE_TAG) >> (CACHE_TAG + BYTE_SELECT))
-    cache_tag = (address >> (CACHE_INDEX + BYTE_SELECT))
+    cache_index = None
+    if CACHE_INDEX == 0:
+      cache_index = 0
+    else:
+      cache_index = int(address[BIT_SIZE - CACHE_INDEX - BYTE_SELECT:BIT_SIZE - BYTE_SELECT], 2)
+    cache_tag = int(address[:BIT_SIZE - CACHE_INDEX - BYTE_SELECT])
 
     print('LOOP START>> cache_index:', cache_index, ', cache_tag:', cache_tag)
 
