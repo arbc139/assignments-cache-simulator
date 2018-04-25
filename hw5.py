@@ -70,27 +70,43 @@ ACCESS_TYPE = {
   'instRead': 2,
 }
 
-def populate_output_file_label(input_file, C, L, K, N):
-  return '%s_(C_%s)_(L_%s)_(K_%s)_(N_%s).csv' % (input_file, C, L, K, N)
+def populate_output_file_label(input_label):
+  return '%s_results.csv' % input_label
 
-def run_all_hw5():
-  C = '64KB'
-  L = '64B'
-  K = '2'
-  N = '512'
-  input_file = INPUT_FOLDER_PATH + 'Trace1'
-  outputFile = OUTPUT_FOLDER_PATH + populate_output_file_label(input_file, C, L, K, N)
+def run_all():
+  input_labels = ['Trace1', 'Trace2']
 
-  # Get Simulator Configurations...
-  config = SimulatorConfig(
-    C=C, L=L, K=K, N=N,
-    BIT_SIZE=BIT_SIZE,
-    input_file=input_file,
-    output_file=outputFile,
-  )
-  run_hw5(config)
+  # TODO(totoro): Needs to parse configs JSON file.
 
-def run_hw5(config):
+  for input_label in input_labels:
+    input_file = INPUT_FOLDER_PATH + input_label
+
+    # Parse trace file to programmable.
+    traces = []
+    with open(input_file, 'r') as trace_file:
+      traces = trace_parser.parse(trace_file, BIT_SIZE)
+
+    # Open CSV file to write...
+    output_file = OUTPUT_FOLDER_PATH + populate_output_file_label(input_label)
+    with open(output_file, 'w+') as csv_file:
+      # TODO(totoro): Loop by JSON parsed configs 
+      C = '64KB'
+      L = '64B'
+      K = '2'
+      N = '512'
+
+      # Get Simulator Configurations...
+      config = SimulatorConfig(C=C, L=L, K=K, N=N, BIT_SIZE=BIT_SIZE)
+      simulation_results = run(traces, config)
+
+      # Print out result file as CSV
+      csv_manager = CsvManager(csv_file, [
+        'Input', 'Cache-Capacity', 'L', 'K', 'N', 'Hit-Ratio',
+        'Miss-Ratio', 'AMAT', 'Hit-Count', 'Miss-Count', 'Access-Count',
+      ])
+      csv_manager.write_row(simulation_results)
+
+def run(traces, config):
   print('BYTE_SELECT:', config.BYTE_SELECT)
   print('CACHE_INDEX:', config.CACHE_INDEX)
   print('CACHE_TAG:', config.CACHE_TAG)
@@ -98,32 +114,19 @@ def run_hw5(config):
   cache = [
     [CacheLine(0, False) for j in range(config.K)] for i in range(config.N)
   ]
-  # Parse trace file to programmable.
-  parsed_traces = []
-  with open(config.input_file, 'r') as trace_file:
-    parsed_traces = trace_parser.parse(trace_file, BIT_SIZE)
-  print(parsed_traces[:10])
 
-  ## Step 1. Run simulator
-  simulation_results = simulate(parsed_traces, cache, config=config)
+  # Run simulator
+  simulation_results = simulate(traces, cache, config=config)
   print('Simulation Result: ', simulation_results)
 
-  formatted_simulation_results = format_simulation_results(
+  return format_simulation_results(
     simulation_results,
     input_label=config.input_file,
     C=config.C,
     L=config.L,
     K=config.K,
-    N=config.N
+    N=config.N,
   )
-
-  ## Step 2. Print out result file as CSV
-  with open(config.output_file, 'w+') as csv_file:
-    csv_manager = CsvManager(csv_file, [
-      'Input', 'Cache-Capacity', 'L', 'K', 'N', 'Hit-Ratio',
-      'Miss-Ratio', 'AMAT', 'Hit-Count', 'Miss-Count', 'Access-Count',
-    ])
-    csv_manager.write_row(formatted_simulation_results)
 
 def format_simulation_results(simulation_results, input_label, C, L, K, N):
   results = {}
@@ -140,13 +143,13 @@ def format_simulation_results(simulation_results, input_label, C, L, K, N):
   results['Access-Count'] = simulation_results['access_count']
   return results
 
-def simulate(parsed_traces, cache, config):
+def simulate(traces, cache, config):
   result = {
     'hit': 0,
     'miss': 0,
     'access_count': 0,
   }
-  for trace in parsed_traces:
+  for trace in traces:
     if trace['type'] not in ACCESS_TYPE.values():
       continue
 

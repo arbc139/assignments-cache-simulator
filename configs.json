@@ -1,9 +1,7 @@
 " C = '64KB'
   L = '64B'
   K = '2'
-  N = '512'
-  inputFile = 'Trace1'
-  outputFile = 'result.csv'"
+  N = '512'"
 [
   {
     "C": "64KB",
