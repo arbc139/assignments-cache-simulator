@@ -104,7 +104,9 @@ def run_all():
     },
   ]
   """
-  raw_configs = json.load('configs.json')
+  raw_configs = []
+  with open('configs.json', 'r') as raw_config_file:
+    raw_configs = json.load(raw_config_file)
   check_raw_configs(raw_configs)
 
   for input_label in input_labels:
