@@ -193,7 +193,7 @@ def simulate(parsed_traces, cache):
       continue
 
     # Evicts random victim
-    victim_k_index = random.randrange(0, options['K'] - 1)
+    victim_k_index = random.randrange(0, options.K - 1)
     cache[cache_index][victim_k_index].valid = True
     cache[cache_index][victim_k_index].tag = cache_tag
 
