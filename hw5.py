@@ -74,10 +74,21 @@ ACCESS_TYPE = {
 def populate_output_file_label(input_label):
   return '%s_results.csv' % input_label
 
+def check_raw_configs(raw_configs):
+  for raw_config in raw_configs:
+    C = int(humanfriendly.parse_size(raw_config['C'], binary=True))
+    L = int(humanfriendly.parse_size(raw_config['L'], binary=True))
+    K = int(raw_config['K'])
+    N = int(raw_config['N'])
+
+    if C != L * K * N:
+      raise RuntimeError('Invalid matching L, K, N, C parameters')
+
 def run_all():
   input_labels = ['Trace1']
 
   # TODO(totoro): Needs to parse configs JSON file.
+  """
   raw_configs = [
     {
       'C': '64KB',
@@ -92,6 +103,9 @@ def run_all():
       'N': '1',
     },
   ]
+  """
+  raw_configs = json.load('configs.json')
+  check_raw_configs(raw_configs)
 
   for input_label in input_labels:
     print('INPUT:', input_label)
