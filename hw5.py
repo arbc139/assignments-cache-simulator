@@ -45,6 +45,7 @@
 # Two address input trace files are attached as files. These files can be used as the input of your simulator. Address format is also attached.
 # * This simulator will be used later to simulate more complex structures as your next HW.
 import humanfriendly
+import json
 import math
 import random
 import sys
@@ -77,6 +78,20 @@ def run_all():
   input_labels = ['Trace1']
 
   # TODO(totoro): Needs to parse configs JSON file.
+  raw_configs = [
+    {
+      'C': '64KB',
+      'L': '64B',
+      'K': '2',
+      'N': '512',
+    },
+    {
+      'C': '64KB',
+      'L': '64B',
+      'K': '1024',
+      'N': '1',
+    },
+  ]
 
   for input_label in input_labels:
     print('INPUT:', input_label)
@@ -90,22 +105,23 @@ def run_all():
     # Open CSV file to write...
     output_file = OUTPUT_FOLDER_PATH + populate_output_file_label(input_label)
     with open(output_file, 'w+') as csv_file:
-      # TODO(totoro): Loop by JSON parsed configs 
-      C = '64KB'
-      L = '64B'
-      K = '2'
-      N = '512'
+      for raw_config in raw_configs:
+        # Get Simulator Configurations...
+        config = SimulatorConfig(
+          C=raw_config['C'],
+          L=raw_config['L'],
+          K=raw_config['K'],
+          N=raw_config['N'],
+          BIT_SIZE=BIT_SIZE,
+        )
+        simulation_results = run(traces, config)
 
-      # Get Simulator Configurations...
-      config = SimulatorConfig(C=C, L=L, K=K, N=N, BIT_SIZE=BIT_SIZE)
-      simulation_results = run(traces, config)
-
-      # Print out result file as CSV
-      csv_manager = CsvManager(csv_file, [
-        'Input', 'Cache-Capacity', 'L', 'K', 'N', 'Hit-Ratio',
-        'Miss-Ratio', 'AMAT', 'Hit-Count', 'Miss-Count', 'Access-Count',
-      ])
-      csv_manager.write_row(simulation_results)
+        # Print out result file as CSV
+        csv_manager = CsvManager(csv_file, [
+          'Input', 'Cache-Capacity', 'L', 'K', 'N', 'Hit-Ratio',
+          'Miss-Ratio', 'AMAT', 'Hit-Count', 'Miss-Count', 'Access-Count',
+        ])
+        csv_manager.write_row(simulation_results)
 
 def run(traces, config):
   print('BYTE_SELECT:', config.BYTE_SELECT)
