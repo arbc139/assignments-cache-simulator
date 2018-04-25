@@ -110,10 +110,14 @@ def run_hw5():
   options = populate_programmable_options(options)
   # Initialize hyper parameters... (Constant)
   setup_hyper_parameters(options)
+  print('option check')
+  print(options)
   # Initialize cache block with [N][K] dimension.
   cache = [
     [CacheLine(0, False) for j in range(options.K)] for i in range(options.N)
   ]
+  print('cache check')
+  print(cache)
   # Parse trace file to programmable.
   """
   parsed_trace = []
