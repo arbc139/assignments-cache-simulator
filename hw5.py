@@ -46,6 +46,7 @@
 # * This simulator will be used later to simulate more complex structures as your next HW.
 import humanfriendly
 import math
+import random
 import sys
 from utils import parse_commands
 from cacheline import CacheLine
@@ -149,21 +150,48 @@ def simulate_hw5(parsed_traces, cache):
     'miss': 0,
     'access_count': 0,
   }
-
-  print('BYTE_SELECT:', BYTE_SELECT)
-  print('CACHE_INDEX:', CACHE_INDEX)
-  print('CACHE_TAG:', CACHE_TAG)
-
   for trace in parsed_traces:
     if trace['type'] not in ACCESS_TYPE.values():
       continue
 
-    address = trace['address']
-    cache_index = (address << CACHE_TAG) >> (CACHE_TAG + BYTE_SELECT)
-    cache_tag = address >> (CACHE_INDEX + BYTE_SELECT)
-
-    print('cache_index:', cache_index)
-    print('cache_tag:', cache_tag)
-
     result['access_count'] += 1
-    return result
+
+    address = trace['address']
+    cache_index = ((address << CACHE_TAG) >> (CACHE_TAG + BYTE_SELECT))
+    cache_tag = (address >> (CACHE_INDEX + BYTE_SELECT))
+
+    # Cache Hit
+    if any(
+      cacheline.valid and cacheline.tag == cache_tag
+      for cacheline in cache[cache_index]):
+        print('hit!!!')
+        print('address:', address)
+        print('index:', cache_index)
+        print('tag:', cache_tag)
+        result['hit'] += 1
+        return result # Temporary statement
+        # continue
+
+    # Cache Miss
+    result['miss'] += 1
+
+    empty_k_index = -1
+    for index, cacheline in enumerate(cache[cache_index]):
+      if not cacheline.valid:
+        empty_k_index = index
+
+    if empty_k_index != -1:
+      cache[cache_index][empty_k_index].valid = True
+      cache[cache_index][empty_k_index].tag = cache_tag
+      print('Found empty k index')
+      print('address:', address)
+      print('index:', cache_index)
+      print(empty_k_index)
+      print('tag:', cache_tag)
+      return result
+      # continue
+
+    # Evicts random victim
+    victim_k_index = random.randrange(0, options.K - 1)
+    cache[cache_index][victim_k_index].valid = True
+    cache[cache_index][victim_k_index].tag = cache_tag
