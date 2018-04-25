@@ -113,6 +113,7 @@ def run_all():
           K=raw_config['K'],
           N=raw_config['N'],
           BIT_SIZE=BIT_SIZE,
+          input_label=input_label,
         )
         simulation_results = run(traces, config)
 
@@ -138,27 +139,12 @@ def run(traces, config):
 
   return format_simulation_results(
     simulation_results,
-    input_label=config.input_file,
+    input_label=config.input_label,
     C=config.C,
     L=config.L,
     K=config.K,
     N=config.N,
   )
-
-def format_simulation_results(simulation_results, input_label, C, L, K, N):
-  results = {}
-  results['Input'] = input_label
-  results['Cache-Capacity'] = humanfriendly.format_size(C, binary=True)
-  results['L'] = humanfriendly.format_size(L, binary=True)
-  results['K'] = K
-  results['N'] = N
-  results['Hit-Ratio'] = simulation_results['hit'] / simulation_results['access_count']
-  results['Miss-Ratio'] = simulation_results['miss'] / simulation_results['access_count']
-  results['AMAT'] =  HIT_TIME + (results['Miss-Ratio'] * MISS_PENALTY)
-  results['Hit-Count'] = simulation_results['hit']
-  results['Miss-Count'] = simulation_results['miss']
-  results['Access-Count'] = simulation_results['access_count']
-  return results
 
 def simulate(traces, cache, config):
   result = {
@@ -211,3 +197,18 @@ def simulate(traces, cache, config):
     cache[cache_index][victim_k_index].tag = cache_tag
 
   return result
+
+def format_simulation_results(simulation_results, input_label, C, L, K, N):
+  results = {}
+  results['Input'] = input_label
+  results['Cache-Capacity'] = humanfriendly.format_size(C, binary=True)
+  results['L'] = humanfriendly.format_size(L, binary=True)
+  results['K'] = K
+  results['N'] = N
+  results['Hit-Ratio'] = simulation_results['hit'] / simulation_results['access_count']
+  results['Miss-Ratio'] = simulation_results['miss'] / simulation_results['access_count']
+  results['AMAT'] =  HIT_TIME + (results['Miss-Ratio'] * MISS_PENALTY)
+  results['Hit-Count'] = simulation_results['hit']
+  results['Miss-Count'] = simulation_results['miss']
+  results['Access-Count'] = simulation_results['access_count']
+  return results
