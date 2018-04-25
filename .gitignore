@@ -1,2 +1,3 @@
 trace-files/
 **/__pycache__/*
+output/
