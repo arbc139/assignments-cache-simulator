@@ -153,7 +153,7 @@ def run_hw5():
   ## Step 3. Print out result file as CSV
   with open(options.outputFile, 'w+') as csv_file:
     csv_manager = CsvManager(csv_file, ['Input', 'Cache Capacity', 'L', 'K', 'N', 'Hit ratio', 'Miss Ratio', 'AMAT', 'Hit Count', 'Miss Count', 'Access Count'])
-    csv_writer.write_row(formatted_simulation_results)
+    csv_manager.write_row(formatted_simulation_results)
 
 def format_simulation_results(simulation_results, input_label, C, L, K, N):
   results = {}
