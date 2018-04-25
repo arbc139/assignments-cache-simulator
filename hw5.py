@@ -49,10 +49,13 @@ import json
 import math
 import random
 import sys
+from utils import parse_commands
 from simulator_config import SimulatorConfig
 from cacheline import CacheLine
 import trace_parser
 from csv_manager import CsvManager
+import multiprocessing as mp
+from functools import partial
 
 # 64 bit machine
 BIT_SIZE = 64
@@ -71,8 +74,13 @@ ACCESS_TYPE = {
   'instRead': 2,
 }
 
+"""
 def populate_output_file_label(input_label):
   return '%s_results.csv' % input_label
+"""
+
+def populate_output_file_label(input_label, C, L, K, N):
+  return '%s_(C_%s)_(L_%s)_(K_%s)_(N_%s)_results.csv' % (input_label, C, L, K, N)
 
 def check_raw_configs(raw_configs):
   for raw_config in raw_configs:
@@ -85,60 +93,59 @@ def check_raw_configs(raw_configs):
       raise RuntimeError('Invalid matching L, K, N, C parameters')
 
 def run_all():
-  input_labels = ['Trace1']
+  command_configs = {
+    '-i': {
+      'longInputForm': '--input-file-label',
+      'field': 'input_file_label',
+    },
+  }
+  commands = parse_commands(sys.argv[1:], command_configs)
 
-  # TODO(totoro): Needs to parse configs JSON file.
-  """
-  raw_configs = [
-    {
-      'C': '64KB',
-      'L': '64B',
-      'K': '2',
-      'N': '512',
-    },
-    {
-      'C': '64KB',
-      'L': '64B',
-      'K': '1024',
-      'N': '1',
-    },
-  ]
-  """
   raw_configs = []
   with open('configs.json', 'r') as raw_config_file:
     raw_configs = json.load(raw_config_file)
   check_raw_configs(raw_configs)
 
-  for input_label in input_labels:
-    print('INPUT:', input_label)
-    input_file = INPUT_FOLDER_PATH + input_label
+  print('INPUT:', commands.input_file_label)
+  input_file = INPUT_FOLDER_PATH + commands.input_file_label
 
-    # Parse trace file to programmable.
-    traces = []
-    with open(input_file, 'r') as trace_file:
-      traces = trace_parser.parse(trace_file, BIT_SIZE)
+  # Parse trace file to programmable.
+  traces = []
+  with open(input_file, 'r') as trace_file:
+    traces = trace_parser.parse(trace_file, BIT_SIZE)
 
-    # Open CSV file to write...
-    output_file = OUTPUT_FOLDER_PATH + populate_output_file_label(input_label)
-    with open(output_file, 'w+') as csv_file:
-      for raw_config in raw_configs:
-        # Get Simulator Configurations...
-        config = SimulatorConfig(
-          C=raw_config['C'],
-          L=raw_config['L'],
-          K=raw_config['K'],
-          N=raw_config['N'],
-          BIT_SIZE=BIT_SIZE,
-          input_label=input_label,
-        )
-        simulation_results = run(traces, config)
+  # Run in multi-process
+  pool = mp.Pool()
+  mpfunc = partial(multiprocess, traces, commands)
+  pool.map(mpfunc, raw_configs)
 
-        # Print out result file as CSV
-        csv_manager = CsvManager(csv_file, [
-          'Input', 'Cache-Capacity', 'L', 'K', 'N', 'Hit-Ratio',
-          'Miss-Ratio', 'AMAT', 'Hit-Count', 'Miss-Count', 'Access-Count',
-        ])
-        csv_manager.write_row(simulation_results)
+def multiprocess(traces, commands, raw_config):
+  # Get Simulator Configurations...
+  config = SimulatorConfig(
+    C=raw_config['C'],
+    L=raw_config['L'],
+    K=raw_config['K'],
+    N=raw_config['N'],
+    BIT_SIZE=BIT_SIZE,
+    input_label=commands.input_file_label,
+  )
+  simulation_results = run(traces, config)
+
+  # Open CSV file to write...
+  output_file = OUTPUT_FOLDER_PATH + populate_output_file_label(
+    commands.input_file_label,
+    C=raw_config['C'],
+    L=raw_config['L'],
+    K=raw_config['K'],
+    N=raw_config['N'],
+  )
+  with open(output_file, 'w+') as csv_file:
+    # Print out result file as CSV
+    csv_manager = CsvManager(csv_file, [
+      'Input', 'Cache-Capacity', 'L', 'K', 'N', 'Hit-Ratio',
+      'Miss-Ratio', 'AMAT', 'Hit-Count', 'Miss-Count', 'Access-Count',
+    ])
+    csv_manager.write_row(simulation_results)
 
 def run(traces, config):
   print('BYTE_SELECT:', config.BYTE_SELECT)
