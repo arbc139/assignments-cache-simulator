@@ -152,22 +152,22 @@ def run_hw5():
 
   ## Step 3. Print out result file as CSV
   with open(options.outputFile, 'w+') as csv_file:
-    csv_manager = CsvManager(csv_file, ['Input', 'Cache Capacity', 'L', 'K', 'N', 'Hit ratio', 'Miss Ratio', 'AMAT', 'Hit Count', 'Miss Count', 'Access Count'])
+    csv_manager = CsvManager(csv_file, ['Input', 'Cache-Capacity', 'L', 'K', 'N', 'Hit-Ratio', 'Miss-Ratio', 'AMAT', 'Hit-Count', 'Miss-Count', 'Access-Count'])
     csv_manager.write_row(formatted_simulation_results)
 
 def format_simulation_results(simulation_results, input_label, C, L, K, N):
   results = {}
   results['Input'] = input_label
-  results['Cache Capacity'] = C
+  results['Cache-Capacity'] = C
   results['L'] = L
   results['K'] = K
   results['N'] = N
-  results['Hit ratio'] = simulation_results['hit'] / simulation_results['access_count']
-  results['Miss ratio'] = simulation_results['miss'] / simulation_results['access_count']
-  results['AMAT'] =  HIT_TIME + (results['Miss ratio'] * MISS_PENALTY)
-  results['Hit Count'] = simulation_results['hit']
-  results['Miss Count'] = simulation_results['miss']
-  results['Access Count'] = simulation_results['access_count']
+  results['Hit-Ratio'] = simulation_results['hit'] / simulation_results['access_count']
+  results['Miss-Ratio'] = simulation_results['miss'] / simulation_results['access_count']
+  results['AMAT'] =  HIT_TIME + (results['Miss-Ratio'] * MISS_PENALTY)
+  results['Hit-Count'] = simulation_results['hit']
+  results['Miss-Count'] = simulation_results['miss']
+  results['Access-Count'] = simulation_results['access_count']
   return results
 
 def simulate(parsed_traces, cache):
