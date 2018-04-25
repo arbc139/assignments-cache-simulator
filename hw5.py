@@ -78,7 +78,10 @@ def populate_programmable_options(options):
     raise RuntimeError('Invalid matching L, K, N, C parameters')
   return options
 
-def setup_hyper_parameters(options):
+def setup_global_parameters(options):
+  global BYTE_SELECT
+  global CACHE_INDEX
+  global CACHE_TAG
   BYTE_SELECT = int(math.log(options.L, 2))
   CACHE_INDEX = int(math.log(options.N, 2))
   CACHE_TAG = 64 - BYTE_SELECT - CACHE_INDEX
@@ -115,8 +118,8 @@ def run_hw5():
   options = parse_commands(sys.argv[1:], option_configs)
   # Transforms parameter options programmable.
   options = populate_programmable_options(options)
-  # Initialize hyper parameters... (Constant)
-  setup_hyper_parameters(options)
+  # Initialize global parameters... (After this line, should be used as constant)
+  setup_global_parameters(options)
   # Initialize cache block with [N][K] dimension.
   cache = [
     [CacheLine(0, False) for j in range(options.K)] for i in range(options.N)
