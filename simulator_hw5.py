@@ -89,11 +89,11 @@ def run_hw5():
       'longInputForm': '--cacheCapacity',
       'field': 'C',
     },
-    '-f': {
+    '-i': {
       'longInputForm': '--inputFile',
       'field': 'inputFile',
     },
-    '-f': {
+    '-o': {
       'longInputForm': '--outputFile',
       'field': 'outputFile',
     },
