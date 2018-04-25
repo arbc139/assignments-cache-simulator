@@ -53,6 +53,7 @@ from cacheline import CacheLine
 import trace_parser
 
 options = {}
+BIT_SIZE = 64
 # Assumes to set '1'
 HIT_TIME = 1
 # Assumes to set '20'
@@ -85,7 +86,7 @@ def setup_global_parameters(options):
   global CACHE_TAG
   BYTE_SELECT = int(math.log(options.L, 2))
   CACHE_INDEX = int(math.log(options.N, 2))
-  CACHE_TAG = 64 - BYTE_SELECT - CACHE_INDEX
+  CACHE_TAG = BIT_SIZE - BYTE_SELECT - CACHE_INDEX
 
 def run_hw5():
   option_configs = {
@@ -131,7 +132,7 @@ def run_hw5():
   # Parse trace file to programmable.
   parsed_traces = []
   with open(options.inputFile, 'r') as trace_file:
-    parsed_traces = trace_parser.parse(trace_file)
+    parsed_traces = trace_parser.parse(trace_file, BIT_SIZE)
   print(parsed_traces[:10])
 
   ## Step 2. Run simulator
@@ -159,7 +160,7 @@ def simulate_hw5(parsed_traces, cache):
 
     result['access_count'] += 1
 
-    address = bin(trace['address'])
+    address = trace['address']
     print('address:', address)
     cache_index = ((address << CACHE_TAG) >> (CACHE_TAG + BYTE_SELECT))
     cache_tag = (address >> (CACHE_INDEX + BYTE_SELECT))
