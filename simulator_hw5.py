@@ -49,6 +49,7 @@ import math
 import sys
 from utils import parse_commands
 from cacheline import CacheLine
+import trace_parser
 
 options = {}
 # Assumes to set '1'
@@ -114,11 +115,10 @@ def run_hw5():
     [CacheLine(0, False) for j in range(options.K)] for i in range(options.N)
   ]
   # Parse trace file to programmable.
-  """
   parsed_trace = []
   with open(options.inputFile, 'r') as trace_file:
-    parsed_trace = TraceParser.parse(trace_file)
-  """
+    parsed_trace = trace_parser.parse(trace_file)
+  print(parsed_trace[:10])
 
   ## Step 2. Run simulator
   """
