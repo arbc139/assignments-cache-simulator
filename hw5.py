@@ -215,7 +215,11 @@ def simulate(traces, cache, config):
       continue
 
     # Evicts random victim
-    victim_k_index = random.randrange(0, config.K - 1)
+    victim_k_index = -1
+    if config.K == 1:
+      victim_k_index = 0
+    else:
+      victim_k_index = random.randrange(0, config.K - 1)
     cache[cache_index][victim_k_index].valid = True
     cache[cache_index][victim_k_index].tag = cache_tag
 

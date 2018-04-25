@@ -1,3 +1,5 @@
 trace-files/
 **/__pycache__/*
 output/
+*.log
+*.pyc
