@@ -193,13 +193,7 @@ def simulate_hw5(parsed_traces, cache):
     if empty_k_index != -1:
       cache[cache_index][empty_k_index].valid = True
       cache[cache_index][empty_k_index].tag = cache_tag
-      print('Found empty k index')
-      print('address:', address)
-      print('index:', cache_index)
-      print(empty_k_index)
-      print('tag:', cache_tag)
-      return result
-      # continue
+      continue
 
     # Evicts random victim
     victim_k_index = random.randrange(0, options.K - 1)
