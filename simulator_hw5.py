@@ -74,7 +74,7 @@ def setup_hyper_parameters(options):
 def run_hw5():
   option_configs = {
     '-L': {
-      'longInputForm': '--blockSize',
+      'longInputForm': '--block-size',
       'field': 'L',
     },
     '-K': {
@@ -82,19 +82,19 @@ def run_hw5():
       'field': 'K',
     },
     '-N': {
-      'longInputForm': '--cacheSize',
+      'longInputForm': '--cache-size',
       'field': 'N',
     },
     '-C': {
-      'longInputForm': '--cacheCapacity',
+      'longInputForm': '--cache-capacity',
       'field': 'C',
     },
     '-i': {
-      'longInputForm': '--inputFile',
+      'longInputForm': '--input-file',
       'field': 'inputFile',
     },
     '-o': {
-      'longInputForm': '--outputFile',
+      'longInputForm': '--output-file',
       'field': 'outputFile',
     },
   },
