@@ -101,8 +101,6 @@ def run_hw5():
   ## Step 1. Prepare to simulation
   # Parse command line options...
   options = parse_commands(sys.argv[1:], option_configs)
-  # Checks options parsed successfully
-  check_options(options, option_configs)
   # Transforms parameter options programmable.
   options = populate_programmable_options(options)
   # Initialize hyper parameters... (Constant)
