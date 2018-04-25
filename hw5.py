@@ -125,6 +125,7 @@ def run_hw5():
   parsed_traces = []
   with open(options.inputFile, 'r') as trace_file:
     parsed_traces = trace_parser.parse(trace_file)
+  print(parsed_traces[:10])
 
   ## Step 2. Run simulator
   # simulation_result = simulate_hw5(parsed_traces, cache)
@@ -148,4 +149,13 @@ def simulate_hw5(parsed_traces, cache):
   for trace in parsed_traces:
     if trace.type not in ACCESS_TYPE.values():
       continue
+
+    address = trace.address
+    cache_index = (address << CACHE_TAG) >> (CACHE_TAG + BYTE_SELECT)
+    cache_tag = address >> (CACHE_INDEX + BYTE_SELECT)
+
+    print('cache_index:', cache_index)
+    print('cache_tag:', cache_tag)
+
     result.access_count += 1
+    return result
