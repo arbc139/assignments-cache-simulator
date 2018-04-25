@@ -137,6 +137,7 @@ def run_hw5():
 
   ## Step 2. Run simulator
   simulation_result = simulate_hw5(parsed_traces, cache)
+  print(simulation_result)
 
   ## Step 3. Print out result file as CSV
   """
@@ -162,25 +163,20 @@ def simulate_hw5(parsed_traces, cache):
 
     address = trace['address']
     cache_index = None
+    # Extracts Cache Index from Address...
     if CACHE_INDEX == 0:
       cache_index = 0
     else:
       cache_index = int(address[BIT_SIZE - CACHE_INDEX - BYTE_SELECT:BIT_SIZE - BYTE_SELECT], 2)
+    # Extracts Cache Tag from Address...
     cache_tag = int(address[:BIT_SIZE - CACHE_INDEX - BYTE_SELECT])
-
-    print('LOOP START>> cache_index:', cache_index, ', cache_tag:', cache_tag)
 
     # Cache Hit
     if any(
       cacheline.valid and cacheline.tag == cache_tag
       for cacheline in cache[cache_index]):
-        print('hit!!!')
-        print('address:', address)
-        print('index:', cache_index)
-        print('tag:', cache_tag)
         result['hit'] += 1
-        return result # Temporary statement
-        # continue
+        continue
 
     # Cache Miss
     result['miss'] += 1
@@ -199,3 +195,5 @@ def simulate_hw5(parsed_traces, cache):
     victim_k_index = random.randrange(0, options.K - 1)
     cache[cache_index][victim_k_index].valid = True
     cache[cache_index][victim_k_index].tag = cache_tag
+
+  return result
