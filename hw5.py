@@ -80,8 +80,7 @@ def run_all_hw5():
   N = '512'
   input_file = INPUT_FOLDER_PATH + 'Trace1'
   outputFile = OUTPUT_FOLDER_PATH + populate_output_file_label(input_file, C, L, K, N)
-  
-  ## Step 1. Prepare to simulation
+
   # Get Simulator Configurations...
   config = SimulatorConfig(
     C=C, L=L, K=K, N=N,
@@ -105,7 +104,7 @@ def run_hw5(config):
     parsed_traces = trace_parser.parse(trace_file, BIT_SIZE)
   print(parsed_traces[:10])
 
-  ## Step 2. Run simulator
+  ## Step 1. Run simulator
   simulation_results = simulate(parsed_traces, cache, config=config)
   print('Simulation Result: ', simulation_results)
 
@@ -118,7 +117,7 @@ def run_hw5(config):
     N=config.N
   )
 
-  ## Step 3. Print out result file as CSV
+  ## Step 2. Print out result file as CSV
   with open(config.output_file, 'w+') as csv_file:
     csv_manager = CsvManager(csv_file, [
       'Input', 'Cache-Capacity', 'L', 'K', 'N', 'Hit-Ratio',

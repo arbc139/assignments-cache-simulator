@@ -1,7 +1,7 @@
 
 import sys
 from utils import parse_commands
-from hw5 import run_hw5
+from hw5 import run_all_hw5
 
 def main():
   run_all_hw5()
