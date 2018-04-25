@@ -53,7 +53,7 @@ from cacheline import CacheLine
 import trace_parser
 from csv_manager import CsvManager
 
-options = {}
+options = None
 BIT_SIZE = 64
 # Assumes to set '1'
 HIT_TIME = 1
@@ -138,17 +138,37 @@ def run_hw5():
   print(parsed_traces[:10])
 
   ## Step 2. Run simulator
-  simulation_result = simulate(parsed_traces, cache)
-  print(simulation_result)
+  simulation_results = simulate(parsed_traces, cache)
+  print('Simulation Result: ', simulation_results)
+
+  formatted_simulation_results = format_simulation_results(
+    simulation_results,
+    input_label=options.outputFile,
+    capacity=options.capacity,
+    L=options.L,
+    K=options.K,
+    N=options.N
+  )
 
   ## Step 3. Print out result file as CSV
   with open(options.outputFile, 'w+') as csv_file:
-    csv_manager = CsvManager(output_file, [options...])
-    for key, value in simulation_result.items():
-      csv_writer.write_row({
-        options...
-        key: value
-      })
+    csv_manager = CsvManager(csv_file, ['Input', 'Cache Capacity', 'L', 'K', 'N', 'Hit ratio', 'Miss Ratio', 'AMAT', 'Hit Count', 'Miss Count', 'Access Count'])
+    csv_writer.write_row(formatted_simulation_results)
+
+def format_simulation_results(simulation_results, input_label, capacity, L, K, N):
+  results = {}
+  results['Input'] = input_label
+  results['Cache Capacity'] = capacity
+  results['L'] = L
+  results['K'] = K
+  results['N'] = N
+  results['Hit ratio'] = simulation_results['hit'] / simulation_results['access_count']
+  results['Miss ratio'] = simulation_results['miss'] / simulation_results['access_count']
+  results['AMAT'] =  HIT_TIME + (results['Miss ratio'] * MISS_PENALTY)
+  results['Hit Count'] = simulation_results['hit']
+  results['Miss Count'] = simulation_results['miss']
+  results['Access Count'] = simulation_results['access_count']
+  return results
 
 def simulate(parsed_traces, cache):
   result = {
