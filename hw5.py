@@ -115,7 +115,7 @@ def run_all():
     traces = trace_parser.parse(trace_file, BIT_SIZE)
 
   # Run in multi-process
-  pool = mp.Pool()
+  pool = mp.Pool(21)
   mpfunc = partial(multiprocess, traces, commands)
   pool.map(mpfunc, raw_configs)
 
