@@ -47,7 +47,7 @@
 import humanfriendly
 import math
 import sys
-from utils import parse_commands, check_options
+from utils import parse_commands
 from cacheline import CacheLine
 
 options = {}
