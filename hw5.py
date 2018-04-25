@@ -160,6 +160,8 @@ def simulate_hw5(parsed_traces, cache):
     cache_index = ((address << CACHE_TAG) >> (CACHE_TAG + BYTE_SELECT))
     cache_tag = (address >> (CACHE_INDEX + BYTE_SELECT))
 
+    print('LOOP START>> cache_index:', cache_index, ', cache_tag:', cache_tag)
+
     # Cache Hit
     if any(
       cacheline.valid and cacheline.tag == cache_tag
