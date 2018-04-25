@@ -69,7 +69,7 @@ ACCESS_TYPE = {
   'instRead': 2,
 }
 
-def populate_programmable_options(options):
+def populate_programmable_options():
   global options
   options.C = humanfriendly.parse_size(options.C, binary=True)
   options.L = humanfriendly.parse_size(options.L, binary=True)
@@ -79,7 +79,6 @@ def populate_programmable_options(options):
   options.N = int(options.N)
   if options.C != options.L * options.K * options.N:
     raise RuntimeError('Invalid matching L, K, N, C parameters')
-  return options
 
 def setup_global_parameters(options):
   global BYTE_SELECT
@@ -90,6 +89,7 @@ def setup_global_parameters(options):
   CACHE_TAG = BIT_SIZE - BYTE_SELECT - CACHE_INDEX
 
 def run_hw5():
+  global options
   option_configs = {
     '-L': {
       'longInputForm': '--block-size',
@@ -120,7 +120,7 @@ def run_hw5():
   # Parse command line options...
   options = parse_commands(sys.argv[1:], option_configs)
   # Transforms parameter options programmable.
-  options = populate_programmable_options(options)
+  populate_programmable_options()
   # Initialize global parameters... (After this line, should be used as constant)
   setup_global_parameters(options)
   print('BYTE_SELECT:', BYTE_SELECT)
