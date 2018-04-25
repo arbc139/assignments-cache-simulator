@@ -121,9 +121,9 @@ def run_hw5():
   options = populate_programmable_options(options)
   # Initialize global parameters... (After this line, should be used as constant)
   setup_global_parameters(options)
-  print(BYTE_SELECT)
-  print(CACHE_INDEX)
-  print(CACHE_TAG)
+  print('BYTE_SELECT:', BYTE_SELECT)
+  print('CACHE_INDEX:', CACHE_INDEX)
+  print('CACHE_TAG:', CACHE_TAG)
   # Initialize cache block with [N][K] dimension.
   cache = [
     [CacheLine(0, False) for j in range(options.K)] for i in range(options.N)
