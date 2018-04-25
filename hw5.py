@@ -144,7 +144,7 @@ def run_hw5():
   formatted_simulation_results = format_simulation_results(
     simulation_results,
     input_label=options.outputFile,
-    capacity=options.capacity,
+    C=options.C,
     L=options.L,
     K=options.K,
     N=options.N
@@ -155,10 +155,10 @@ def run_hw5():
     csv_manager = CsvManager(csv_file, ['Input', 'Cache Capacity', 'L', 'K', 'N', 'Hit ratio', 'Miss Ratio', 'AMAT', 'Hit Count', 'Miss Count', 'Access Count'])
     csv_writer.write_row(formatted_simulation_results)
 
-def format_simulation_results(simulation_results, input_label, capacity, L, K, N):
+def format_simulation_results(simulation_results, input_label, C, L, K, N):
   results = {}
   results['Input'] = input_label
-  results['Cache Capacity'] = capacity
+  results['Cache Capacity'] = C
   results['L'] = L
   results['K'] = K
   results['N'] = N
