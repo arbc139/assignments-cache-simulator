@@ -48,20 +48,17 @@ import humanfriendly
 import math
 import random
 import sys
-from utils import parse_commands
+from configs import SimulatorConfig
 from cacheline import CacheLine
 import trace_parser
 from csv_manager import CsvManager
 
-options = None
+# 64 bit machine
 BIT_SIZE = 64
 # Assumes to set '1'
 HIT_TIME = 1
 # Assumes to set '20'
 MISS_PENALTY = 20
-BYTE_SELECT = -1 # Not initialized.
-CACHE_INDEX = -1 # Not initialized.
-CACHE_TAG = -1 # Not initialized.
 
 # Cache Access Types
 ACCESS_TYPE = {
@@ -70,96 +67,61 @@ ACCESS_TYPE = {
   'instRead': 2,
 }
 
-def populate_programmable_options():
-  global options
-  options.C = humanfriendly.parse_size(options.C, binary=True)
-  options.L = humanfriendly.parse_size(options.L, binary=True)
-  options.C = int(options.C)
-  options.L = int(options.L)
-  options.K = int(options.K)
-  options.N = int(options.N)
-  if options.C != options.L * options.K * options.N:
-    raise RuntimeError('Invalid matching L, K, N, C parameters')
-
-def setup_global_parameters(options):
-  global BYTE_SELECT
-  global CACHE_INDEX
-  global CACHE_TAG
-  BYTE_SELECT = int(math.log(options.L, 2))
-  CACHE_INDEX = int(math.log(options.N, 2))
-  CACHE_TAG = BIT_SIZE - BYTE_SELECT - CACHE_INDEX
-
 def run_hw5():
-  global options
-  option_configs = {
-    '-L': {
-      'longInputForm': '--block-size',
-      'field': 'L',
-    },
-    '-K': {
-      'longInputForm': '--associative',
-      'field': 'K',
-    },
-    '-N': {
-      'longInputForm': '--cache-size',
-      'field': 'N',
-    },
-    '-C': {
-      'longInputForm': '--cache-capacity',
-      'field': 'C',
-    },
-    '-i': {
-      'longInputForm': '--input-file',
-      'field': 'inputFile',
-    },
-    '-o': {
-      'longInputForm': '--output-file',
-      'field': 'outputFile',
-    },
-  }
+  C = '64KB'
+  L = '64B'
+  K = '2'
+  N = '512'
+  inputFile = 'trace-files/Trace1'
+  outputFile = 'output/result.csv'
+  
   ## Step 1. Prepare to simulation
-  # Parse command line options...
-  options = parse_commands(sys.argv[1:], option_configs)
-  # Transforms parameter options programmable.
-  populate_programmable_options()
-  # Initialize global parameters... (After this line, should be used as constant)
-  setup_global_parameters(options)
-  print('BYTE_SELECT:', BYTE_SELECT)
-  print('CACHE_INDEX:', CACHE_INDEX)
-  print('CACHE_TAG:', CACHE_TAG)
+  # Get Simulator Configurations...
+  config = SimulatorConfig(
+    C=C, L=L, K=K, N=N,
+    BIT_SIZE=BIT_SIZE,
+    input_file=inputFile,
+    output_file=outputFile,
+  )
+  print('BYTE_SELECT:', config.BYTE_SELECT)
+  print('CACHE_INDEX:', config.CACHE_INDEX)
+  print('CACHE_TAG:', config.CACHE_TAG)
   # Initialize cache block with [N][K] dimension.
   cache = [
-    [CacheLine(0, False) for j in range(options.K)] for i in range(options.N)
+    [CacheLine(0, False) for j in range(config.K)] for i in range(config.N)
   ]
   # Parse trace file to programmable.
   parsed_traces = []
-  with open(options.inputFile, 'r') as trace_file:
+  with open(config.input_file, 'r') as trace_file:
     parsed_traces = trace_parser.parse(trace_file, BIT_SIZE)
   print(parsed_traces[:10])
 
   ## Step 2. Run simulator
-  simulation_results = simulate(parsed_traces, cache)
+  simulation_results = simulate(parsed_traces, cache, config=config)
   print('Simulation Result: ', simulation_results)
 
   formatted_simulation_results = format_simulation_results(
     simulation_results,
-    input_label=options.outputFile,
-    C=options.C,
-    L=options.L,
-    K=options.K,
-    N=options.N
+    input_label=config.input_file,
+    C=config.C,
+    L=config.L,
+    K=config.K,
+    N=config.N
   )
 
   ## Step 3. Print out result file as CSV
-  with open(options.outputFile, 'w+') as csv_file:
-    csv_manager = CsvManager(csv_file, ['Input', 'Cache-Capacity', 'L', 'K', 'N', 'Hit-Ratio', 'Miss-Ratio', 'AMAT', 'Hit-Count', 'Miss-Count', 'Access-Count'])
+  with open(config.output_file, 'w+') as csv_file:
+    csv_manager = CsvManager(csv_file, [
+      'Input', 'Cache-Capacity', 'L', 'K', 'N', 'Hit-Ratio',
+      'Miss-Ratio', 'AMAT', 'Hit-Count', 'Miss-Count', 'Access-Count',
+    ])
     csv_manager.write_row(formatted_simulation_results)
 
 def format_simulation_results(simulation_results, input_label, C, L, K, N):
   results = {}
   results['Input'] = input_label
-  results['Cache-Capacity'] = C
-  results['L'] = L
+  results['Cache-Capacity'] = humanfriendly.format_size(C, binary=True)
+  results['L'] = humanfriendly.format_size(L, binary=True)
   results['K'] = K
   results['N'] = N
   results['Hit-Ratio'] = simulation_results['hit'] / simulation_results['access_count']
@@ -170,7 +132,7 @@ def format_simulation_results(simulation_results, input_label, C, L, K, N):
   results['Access-Count'] = simulation_results['access_count']
   return results
 
-def simulate(parsed_traces, cache):
+def simulate(parsed_traces, cache, config):
   result = {
     'hit': 0,
     'miss': 0,
@@ -185,12 +147,15 @@ def simulate(parsed_traces, cache):
     address = trace['address']
     cache_index = None
     # Extracts Cache Index from Address...
-    if CACHE_INDEX == 0:
+    if config.CACHE_INDEX == 0:
       cache_index = 0
     else:
-      cache_index = int(address[BIT_SIZE - CACHE_INDEX - BYTE_SELECT:BIT_SIZE - BYTE_SELECT], 2)
+      start = BIT_SIZE - config.CACHE_INDEX - config.BYTE_SELECT
+      end = BIT_SIZE - config.BYTE_SELECT
+      cache_index = int(address[start:end], 2)
     # Extracts Cache Tag from Address...
-    cache_tag = int(address[:BIT_SIZE - CACHE_INDEX - BYTE_SELECT])
+    end = BIT_SIZE - config.CACHE_INDEX - config.BYTE_SELECT
+    cache_tag = int(address[:end])
 
     # Cache Hit
     if any(
@@ -213,7 +178,7 @@ def simulate(parsed_traces, cache):
       continue
 
     # Evicts random victim
-    victim_k_index = random.randrange(0, options.K - 1)
+    victim_k_index = random.randrange(0, config.K - 1)
     cache[cache_index][victim_k_index].valid = True
     cache[cache_index][victim_k_index].tag = cache_tag
 
