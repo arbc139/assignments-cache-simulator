@@ -81,7 +81,7 @@ def populate_programmable_options(options):
 def setup_hyper_parameters(options):
   BYTE_SELECT = math.log(options.L, 2)
   CACHE_INDEX = math.log(options.N, 2)
-  CACHE_TAG = 32 - BYTE_SELECT - CACHE_INDEX
+  CACHE_TAG = 64 - BYTE_SELECT - CACHE_INDEX
 
 def run_hw5():
   option_configs = {

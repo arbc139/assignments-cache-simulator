@@ -7,6 +7,6 @@ def parse(trace_file):
     if not line: break
     result.append({
       'type': int(tokenized_line[0]),
-      'address': hex(tokenized_line[1]),
+      'address': hex(int(tokenized_line[1], 16)),
     })
   return result
