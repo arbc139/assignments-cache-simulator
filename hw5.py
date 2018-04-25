@@ -51,6 +51,7 @@ import sys
 from utils import parse_commands
 from cacheline import CacheLine
 import trace_parser
+from csv_manager import CsvManager
 
 options = {}
 BIT_SIZE = 64
@@ -141,14 +142,13 @@ def run_hw5():
   print(simulation_result)
 
   ## Step 3. Print out result file as CSV
-  """
-  csv_writer = CsvWriter(output_file, [options...])
-  for key, value in simulation_result.items():
-    csv_writer.write_row({
-      options...
-      key: value
-    })
-  """
+  with open(options.outputFile, 'w+') as csv_file:
+    csv_manager = CsvManager(output_file, [options...])
+    for key, value in simulation_result.items():
+      csv_writer.write_row({
+        options...
+        key: value
+      })
 
 def simulate(parsed_traces, cache):
   result = {
