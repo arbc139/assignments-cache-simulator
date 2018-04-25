@@ -62,6 +62,10 @@ CACHE_TAG = -1 # Not initialized.
 def populate_programmable_options(options):
   options.C = humanfriendly.parse_size(options.C, binary=True)
   options.L = humanfriendly.parse_size(options.L, binary=True)
+  options.C = int(options.C)
+  options.L = int(options.L)
+  options.K = int(options.K)
+  options.N = int(options.N)
   if options.C != options.L * options.K * options.N:
     raise RuntimeError('Invalid matching L, K, N, C parameters')
   return options
@@ -105,14 +109,10 @@ def run_hw5():
   options = populate_programmable_options(options)
   # Initialize hyper parameters... (Constant)
   setup_hyper_parameters(options)
-  print('option check')
-  print(options)
   # Initialize cache block with [N][K] dimension.
   cache = [
     [CacheLine(0, False) for j in range(options.K)] for i in range(options.N)
   ]
-  print('cache check')
-  print(cache)
   # Parse trace file to programmable.
   """
   parsed_trace = []
