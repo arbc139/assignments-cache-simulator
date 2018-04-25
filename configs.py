@@ -14,6 +14,6 @@ class SimulatorConfig:
 
     self.input_file = input_file
     self.output_file = output_file
-    self.BYTE_SELECT = int(math.log(L, 2))
-    self.CACHE_INDEX = int(math.log(N, 2))
+    self.BYTE_SELECT = int(math.log(self.L, 2))
+    self.CACHE_INDEX = int(math.log(self.N, 2))
     self.CACHE_TAG = BIT_SIZE - self.BYTE_SELECT - self.CACHE_INDEX
