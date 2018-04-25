@@ -97,7 +97,7 @@ def run_hw5():
       'longInputForm': '--output-file',
       'field': 'outputFile',
     },
-  },
+  }
   ## Step 1. Prepare to simulation
   # Parse command line options...
   options = parse_commands(sys.argv[1:], option_configs)
