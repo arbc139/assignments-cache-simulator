@@ -9,11 +9,9 @@ def parse(trace_file, BIT_SIZE):
     HEX_SIZE = int(BIT_SIZE / 4)
 
     tokenized_line[1] = tokenized_line[1].replace('0x', '')
-    address_arr = ['0' for _ in range(HEX_SIZE - len(tokenized_line[1]))] \
-      + tokenized_line[1]
-    address = ''.join(address_arr)
+    address = ''.join(['0' for _ in range(HEX_SIZE - len(tokenized_line[1]))]) + tokenized_line[1]
     result.append({
       'type': int(tokenized_line[0]),
-      'address': tokenized_line[1],
+      'address': address,
     })
   return result
