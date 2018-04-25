@@ -82,9 +82,6 @@ def setup_hyper_parameters(options):
   BYTE_SELECT = int(math.log(options.L, 2))
   CACHE_INDEX = int(math.log(options.N, 2))
   CACHE_TAG = 64 - BYTE_SELECT - CACHE_INDEX
-  print('BYTE_SELECT:', BYTE_SELECT)
-  print('CACHE_INDEX:', CACHE_INDEX)
-  print('CACHE_TAG:', CACHE_TAG)
 
 def run_hw5():
   option_configs = {
@@ -149,6 +146,11 @@ def simulate_hw5(parsed_traces, cache):
     'miss': 0,
     'access_count': 0,
   }
+
+  print('BYTE_SELECT:', BYTE_SELECT)
+  print('CACHE_INDEX:', CACHE_INDEX)
+  print('CACHE_TAG:', CACHE_TAG)
+
   for trace in parsed_traces:
     if trace['type'] not in ACCESS_TYPE.values():
       continue
