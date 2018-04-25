@@ -1,0 +1,16 @@
+" C = '64KB'
+  L = '64B'
+  K = '2'
+  N = '512'
+  inputFile = 'Trace1'
+  outputFile = 'result.csv'"
+[
+  {
+    "C": "64KB",
+    "L": "64B",
+    "K": "2",
+    "N": "512",
+    "inputFile": "trace-files/Trace1",
+    ""
+  },
+]

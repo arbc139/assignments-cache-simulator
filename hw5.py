@@ -48,7 +48,7 @@ import humanfriendly
 import math
 import random
 import sys
-from configs import SimulatorConfig
+from simulator_config import SimulatorConfig
 from cacheline import CacheLine
 import trace_parser
 from csv_manager import CsvManager
@@ -60,6 +60,9 @@ HIT_TIME = 1
 # Assumes to set '20'
 MISS_PENALTY = 20
 
+INPUT_FOLDER_PATH = 'trace-files/'
+OUTPUT_FOLDER_PATH = 'output/' 
+
 # Cache Access Types
 ACCESS_TYPE = {
   'dataRead': 0,
@@ -67,22 +70,28 @@ ACCESS_TYPE = {
   'instRead': 2,
 }
 
-def run_hw5():
+def populate_output_file_label(input_file, C, L, K, N):
+  return '%s_(C_%s)_(L_%s)_(K_%s)_(N_%s).csv' % (input_file, C, L, K, N)
+
+def run_all_hw5():
   C = '64KB'
   L = '64B'
   K = '2'
   N = '512'
-  inputFile = 'trace-files/Trace1'
-  outputFile = 'output/result.csv'
+  input_file = INPUT_FOLDER_PATH + 'Trace1'
+  outputFile = OUTPUT_FOLDER_PATH + populate_output_file_label(input_file, C, L, K, N)
   
   ## Step 1. Prepare to simulation
   # Get Simulator Configurations...
   config = SimulatorConfig(
     C=C, L=L, K=K, N=N,
     BIT_SIZE=BIT_SIZE,
-    input_file=inputFile,
+    input_file=input_file,
     output_file=outputFile,
   )
+  run_hw5(config)
+
+def run_hw5(config):
   print('BYTE_SELECT:', config.BYTE_SELECT)
   print('CACHE_INDEX:', config.CACHE_INDEX)
   print('CACHE_TAG:', config.CACHE_TAG)
