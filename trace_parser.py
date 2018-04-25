@@ -6,7 +6,7 @@ def parse(trace_file):
     tokenized_line = line.replace('\n', '').split()
     if not line: break
     result.append({
-      'mode': tokenized_line[0],
-      'address': tokenized_line[1],
+      'type': int(tokenized_line[0]),
+      'address': hex(tokenized_line[1]),
     })
   return result

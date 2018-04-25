@@ -60,6 +60,13 @@ BYTE_SELECT = -1 # Not initialized.
 CACHE_INDEX = -1 # Not initialized.
 CACHE_TAG = -1 # Not initialized.
 
+# Cache Access Types
+ACCESS_TYPE = {
+  'dataRead': 0,
+  'dataWrite': 1,
+  'instRead': 2,
+}
+
 def populate_programmable_options(options):
   options.C = humanfriendly.parse_size(options.C, binary=True)
   options.L = humanfriendly.parse_size(options.L, binary=True)
@@ -115,15 +122,12 @@ def run_hw5():
     [CacheLine(0, False) for j in range(options.K)] for i in range(options.N)
   ]
   # Parse trace file to programmable.
-  parsed_trace = []
+  parsed_traces = []
   with open(options.inputFile, 'r') as trace_file:
-    parsed_trace = trace_parser.parse(trace_file)
-  print(parsed_trace[:10])
+    parsed_traces = trace_parser.parse(trace_file)
 
   ## Step 2. Run simulator
-  """
-  simulation_result = Simulator.simulation(parsed_trace, cache)
-  """
+  # simulation_result = simulate_hw5(parsed_traces, cache)
 
   ## Step 3. Print out result file as CSV
   """
@@ -134,3 +138,14 @@ def run_hw5():
       key: value
     })
   """
+
+def simulate_hw5(parsed_traces, cache):
+  result = {
+    'hit': 0,
+    'miss': 0,
+    'access_count': 0,
+  }
+  for trace in parsed_traces:
+    if trace.type not in ACCESS_TYPE.values():
+      continue
+    result.access_count += 1
