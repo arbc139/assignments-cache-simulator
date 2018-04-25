@@ -6,7 +6,7 @@ def parse(trace_file, BIT_SIZE):
     tokenized_line = line.replace('\n', '').split()
     if not line: break
 
-    HEX_SIZE = BIT_SIZE / 4
+    HEX_SIZE = int(BIT_SIZE / 4)
 
     tokenized_line[1] = tokenized_line[1].replace('0x', '')
     address_arr = ['0' for _ in range(HEX_SIZE - len(tokenized_line[1]))] \
