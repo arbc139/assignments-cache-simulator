@@ -65,7 +65,7 @@ HIT_TIME = 1
 MISS_PENALTY = 20
 
 INPUT_FOLDER_PATH = 'trace-files/'
-OUTPUT_FOLDER_PATH = 'output/' 
+OUTPUT_FOLDER_PATH = 'output/'
 
 # Cache Access Types
 ACCESS_TYPE = {
