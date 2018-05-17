@@ -46,6 +46,7 @@
 #   * for (b), provide simulation results on given benchmarks
 #   * show impact on each design parameter you applied
 
+import trace_parser
 from simulator_config import CacheConfig
 from utils import check_raw_configs
 
@@ -54,6 +55,13 @@ BIT_SIZE = 64
 
 INPUT_FOLDER_PATH = 'trace-files/'
 OUTPUT_FOLDER_PATH = 'output/'
+
+# CACHE READ TYPE
+ACCESS_TYPE = {
+  'data_read': 0,
+  'data_write': 1,
+  'inst_read': 2,
+}
 
 def run(commands):
   # Config for L1 I/D, L2 (Fixed)
@@ -92,6 +100,7 @@ def run(commands):
     for raw_config in raw_configs_L3
   ])
 
+  # TODO(totorody): Iterates variable configs to config_L3.
   # Config for L3 (Dynamic)
   config_L3 = CacheConfig(
     C='2MB', L='64B', K=1, N=32768,
@@ -101,4 +110,54 @@ def run(commands):
     MISS_PENALTY=120,
   )
 
+  input_file = INPUT_FOLDER_PATH + commands.input_file_label
+  # Parse trace file to programmable.
+  traces = []
+  with open(input_file, 'r') as trace_file:
+    traces = trace_parser.parse(trace_file, BIT_SIZE)
+
   # TODO(totorody): Implements to run caches
+  cache_L1_inst = Cache(config_L1_inst)
+  cache_L1_data = Cache(config_L1_data)
+  cache_L2 = Cache(config_L2)
+  cache_L3 = Cache(config_L3)
+
+  cache_L1_inst.set_low_cache(cache_L2)
+  cache_L1_data.set_low_cache(cache_L2)
+  cache_L2.set_low_cache(cache_L3)
+
+  print('Start to run caching')
+  for trace in traces:
+    if trace['type'] not in ACCESS_TYPE.values():
+      continue
+    if trace['type'] == ACCESS_TYPE['inst_read']:
+      cache_L1_inst.access(trace)
+    else:
+      cache_L1_data.access(trace)
+
+  print('Caching result')
+  print('L1 inst cache')
+  print('hit: [%d], data miss: [%d], inst_miss: [%d], write: [%d]' % (
+    cache_L1_inst.counts['hit'],
+    cache_L1_inst.counts['data_miss'],
+    cache_L1_inst.counts['inst_miss'],
+    cache_L1_inst.counts['write']))
+  print('L1 data cache')
+  print('hit: [%d], data miss: [%d], inst_miss: [%d], write: [%d]' % (
+    cache_L1_data.counts['hit'],
+    cache_L1_data.counts['data_miss'],
+    cache_L1_data.counts['inst_miss'],
+    cache_L1_data.counts['write']))
+  print('L2 cache')
+  print('hit: [%d], data miss: [%d], inst_miss: [%d], write: [%d]' % (
+    cache_L2.counts['hit'],
+    cache_L2.counts['data_miss'],
+    cache_L2.counts['inst_miss'],
+    cache_L2.counts['write']))
+  print('L3 cache')
+  print('hit: [%d], data miss: [%d], inst_miss: [%d], write: [%d]' % (
+    cache_L3.counts['hit'],
+    cache_L3.counts['data_miss'],
+    cache_L3.counts['inst_miss'],
+    cache_L3.counts['write']))
+  print('END')

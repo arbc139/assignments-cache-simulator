@@ -69,9 +69,9 @@ OUTPUT_FOLDER_PATH = 'output/'
 
 # Cache Access Types
 ACCESS_TYPE = {
-  'dataRead': 0,
-  'dataWrite': 1,
-  'instRead': 2,
+  'data_read': 0,
+  'data_write': 1,
+  'inst_read': 2,
 }
 
 """
