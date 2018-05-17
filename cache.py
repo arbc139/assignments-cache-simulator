@@ -1,5 +1,6 @@
 
 from multiprocessing import Pool
+from functools import partial
 
 # CACHE READ TYPE
 ACCESS_TYPE = {
@@ -84,15 +85,15 @@ class Cache:
 
     return False
 
-  def increase_LRU_parallel(self, N_range):
+  def increase_LRU_parallel(self, test_index, N_range):
     start = N_range[0]
     end = N_range[1]
     result = []
     for i in range(start, end):
       for j in range(self.config.K):
         self.LRU_count[i][j] += 1
-      result += self.LRU_count[i]
-    return result
+      result.append(self.LRU_count[i])
+    return (test_index, result)
 
   def access_parallel(self, trace):
     masked = self.config.masking(trace['address'])
@@ -106,8 +107,10 @@ class Cache:
       )
       for i in range(NUM_OF_PROCESSORS)
     ]
+    test_indexes = [1, 2, 3, 4]
+    mpfunc = partial(self.increase_LRU_parallel, test_indexes)
     with Pool(processes=NUM_OF_PROCESSORS) as pool:
-      result = pool.apply_async(self.increase_LRU_parallel, N_ranges)
+      result = pool.map(mpfunc, N_ranges)
       print(result)
     raise RuntimeError('break point')
     for i in range(self.config.N):
