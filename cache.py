@@ -84,7 +84,7 @@ class Cache:
 
     return False
 
-  def increase_LRU_parallel(self, test_index, N_range):
+  def increase_LRU_parallel(self, N_range):
     start = N_range[0]
     end = N_range[1]
     result = []
@@ -92,7 +92,7 @@ class Cache:
       for j in range(self.config.K):
         self.LRU_count[i][j] += 1
       result.append(self.LRU_count[i])
-    return (test_index, result)
+    return result
 
   def access_parallel(self, trace):
     masked = self.config.masking(trace['address'])
@@ -107,10 +107,8 @@ class Cache:
       for i in range(NUM_OF_PROCESSORS)
     ]
     with Pool(processes=NUM_OF_PROCESSORS) as pool:
-      result = pool.starmap(self.increase_LRU_parallel, N_ranges)
-      self.LRU_count = [elem for elem in sublist for sublist in result]
-      print(LRU_count)
-    raise RuntimeError('break point')
+      result = pool.map(self.increase_LRU_parallel, N_ranges)
+      self.LRU_count = [elem for sublist in result for elem in sublist]
 
     # Hit case!
     for j in range(self.config.K):
