@@ -1,0 +1,104 @@
+# Project: Advanced Cache simulation
+# Design a new level-3 cache management mechanism to exploit the effectiveness
+# of the overall caching structure between the cache and main memory by using
+# DRAMs: one prefecth scheme + at least one new managing/configuration method
+#
+# We need to enhance the effective space of level-3
+#
+# (1) Targets
+# (a) 3 level cache simulator design
+#   * Expand previous L1 cache simulation result
+#   * Fix
+#     L1 instruction: 32KB,
+#     L1 data: 32KB,
+#     L2 unified: 256KB,
+#     L3 unified: 2MB
+#   * L1 I/D: direct mapped cache
+#   * L2 U: 8-way set associative cache
+#   * L3 U: 2MB unified cache
+#   * Use Write buffer scheme, simple LRU for default replacement policy and,
+#     64 byte cache block size for L1 & L2, but design your own method for L3
+#     (Details are shown in (b))
+#
+# (b) A new Level-3 structure and management
+#   * can design any type of L-3 structure with buffers as a new model
+#   * structure and operational mechanism (to support fast accessing latency)
+#     - You need to suggest your own prefetch scheme and replacement policy in
+#       L3
+#     - You can employ any type of L3 configuration with buffering structures
+#       depending on data pattern
+#   * specify design parameters and obtain optimum value
+#   * analysis on this situation by given benchmarks
+#   * chose best design parameter among your applied mechanisms
+#   * If you need, use simulation parameters for performance evaluation in
+#     Table 1.
+#
+#           Table 1. Access latency
+#       -----------------------------------
+#                           Access latency
+#       -----------------------------------
+#         L1 I/D            4 cycles
+#         L2                16 cycles
+#         L3                32 cycles
+#         Main Memory       120 cycles
+#       -----------------------------------
+# (c) Performance analysis result
+#   * for (b), provide simulation results on given benchmarks
+#   * show impact on each design parameter you applied
+
+from simulator_config import CacheConfig
+from utils import check_raw_configs
+
+# 64 Bit machine
+BIT_SIZE = 64
+
+INPUT_FOLDER_PATH = 'trace-files/'
+OUTPUT_FOLDER_PATH = 'output/'
+
+def run(commands):
+  # Config for L1 I/D, L2 (Fixed)
+  config_L1_inst = CacheConfig(
+    C='32KB', L='64B', K=1, N=512,
+    BIT_SIZE=BIT_SIZE,
+    input_label=commands.input_file_label,
+    HIT_TIME=4,
+    MISS_PENALTY=16,
+  )
+  config_L1_data = CacheConfig(
+    C='32KB', L='64B', K=1, N=512,
+    BIT_SIZE=BIT_SIZE,
+    input_label=commands.input_file_label,
+    HIT_TIME=4,
+    MISS_PENALTY=16,
+  )
+  config_L2 = CacheConfig(
+    C='256KB', L='64B', K=8, N=512,
+    BIT_SIZE=BIT_SIZE,
+    input_label=commands.input_file_label,
+    HIT_TIME=16,
+    MISS_PENALTY=32,
+  )
+
+  raw_configs_L3 = []
+  with open('configs/project.json', 'r') as raw_config_file:
+    raw_configs_L3 = json.load(raw_config_file)
+  check_raw_configs([
+    {
+      'C': '2MB',
+      'L': '64B',
+      'K': raw_config['K'],
+      'N': raw_config['N'],
+    }
+    for raw_config in raw_configs_L3
+  ])
+
+  # Config for L3 (Dynamic)
+  config_L3 = CacheConfig(
+    C='2MB', L='64B', K=1, N=32768,
+    BIT_SIZE=BIT_SIZE,
+    input_label=commands.input_file_label,
+    HIT_TIME=32,
+    MISS_PENALTY=120,
+  )
+
+  # TODO(totorody): Implements to run caches

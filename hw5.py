@@ -49,13 +49,13 @@ import json
 import math
 import random
 import sys
-from utils import parse_commands
 from simulator_config import SimulatorConfig
-from cacheline import CacheLine
+from cache import CacheLine
 import trace_parser
 from csv_manager import CsvManager
 import multiprocessing as mp
 from functools import partial
+from utils import check_raw_configs
 
 # 64 bit machine
 BIT_SIZE = 64
@@ -82,27 +82,9 @@ def populate_output_file_label(input_label):
 def populate_output_file_label(input_label, C, L, K, N):
   return '%s_(C_%s)_(L_%s)_(K_%s)_(N_%s)_results.csv' % (input_label, C, L, K, N)
 
-def check_raw_configs(raw_configs):
-  for raw_config in raw_configs:
-    C = int(humanfriendly.parse_size(raw_config['C'], binary=True))
-    L = int(humanfriendly.parse_size(raw_config['L'], binary=True))
-    K = int(raw_config['K'])
-    N = int(raw_config['N'])
-
-    if C != L * K * N:
-      raise RuntimeError('Invalid matching L, K, N, C parameters')
-
-def run_all():
-  command_configs = {
-    '-i': {
-      'longInputForm': '--input-file-label',
-      'field': 'input_file_label',
-    },
-  }
-  commands = parse_commands(sys.argv[1:], command_configs)
-
+def run_all(commands):
   raw_configs = []
-  with open('configs.json', 'r') as raw_config_file:
+  with open('configs/hw5.json', 'r') as raw_config_file:
     raw_configs = json.load(raw_config_file)
   check_raw_configs(raw_configs)
 

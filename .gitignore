@@ -3,3 +3,4 @@ trace-files/
 output/
 *.log
 *.pyc
+.vscode/
