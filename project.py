@@ -129,7 +129,10 @@ def run(commands):
   cache_L2.set_low_cache(cache_L3)
 
   print('Start to run caching')
+  index = 0
   for trace in traces:
+    print('trace #:', index)
+    index += 1
     if trace['type'] not in ACCESS_TYPE.values():
       continue
     if trace['type'] == ACCESS_TYPE['inst_read']:

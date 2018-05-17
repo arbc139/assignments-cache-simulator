@@ -44,31 +44,33 @@ class Cache:
     cache_index = masked[0]
     cache_tag = masked[1]
 
-    max_LRU_count = 0
-    max_LRU_j = 0
     for i in range(self.config.N):
       for j in range(self.config.K):
         self.LRU_count[i][j] += 1
-        if i == cache_index and self.LRU_count[i][j] > max_LRU_count:
-          max_LRU_count = self.LRU_count[i][j]
-          max_LRU_j = j
 
+    # Hit case!
     for j in range(self.config.K):
       if self.cachelines[cache_index][j].tag == cache_tag:
         self.counts['hit'] += 1
         self.LRU_count[cache_index][j] = 0
         return True
 
-    if trace['type'] == ACCESS_TYPE['inst_read']:
-      self.counts['inst_miss'] += 1
-
-    if trace['type'] == ACCESS_TYPE['data_read']:
-      self.counts['data_miss'] += 1
+    # Miss case!
+    max_LRU_count = 0
+    max_LRU_j = 0
+    for j in range(self.config.K):
+      if self.LRU_count[cache_index][j] > max_LRU_count:
+        max_LRU_count = self.LRU_count[cache_index][j]
+        max_LRU_j = j
 
     self.cachelines[cache_index][max_LRU_j] = cache_tag
     self.LRU_count[cache_index][max_LRU_j] = 0
 
-    if trace['type'] == ACCESS_TYPE['data_write']:
+    if trace['type'] == ACCESS_TYPE['inst_read']:
+      self.counts['inst_miss'] += 1
+    elif trace['type'] == ACCESS_TYPE['data_read']:
+      self.counts['data_miss'] += 1
+    elif trace['type'] == ACCESS_TYPE['data_write']:
       self.counts['write'] += 1
 
     if self.low_cache:

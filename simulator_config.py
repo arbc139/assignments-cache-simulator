@@ -30,7 +30,7 @@ class SimulatorConfig:
       cache_index = int(address[start:end], 2)
     # Extracts Cache Tag from Address...
     end = self.BIT_SIZE - self.CACHE_INDEX - self.BYTE_SELECT
-    cache_tag = int(address[:end])
+    cache_tag = int(address[:end], 2)
 
     if cache_index >= N or cache_index < 0:
       raise RuntimeError(
