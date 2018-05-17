@@ -32,7 +32,7 @@ class SimulatorConfig:
     end = self.BIT_SIZE - self.CACHE_INDEX - self.BYTE_SELECT
     cache_tag = int(address[:end], 2)
 
-    if cache_index >= N or cache_index < 0:
+    if cache_index >= self.N or cache_index < 0:
       raise RuntimeError(
         'Index error, cache index overflows out of range: cache_index[%d] index[%d]' % (
           cache_index, self.N))
