@@ -1,6 +1,5 @@
 
 from multiprocessing import Pool
-from functools import partial
 
 # CACHE READ TYPE
 ACCESS_TYPE = {
@@ -108,9 +107,8 @@ class Cache:
       for i in range(NUM_OF_PROCESSORS)
     ]
     test_indexes = [1, 2, 3, 4]
-    mpfunc = partial(self.increase_LRU_parallel, test_indexes)
     with Pool(processes=NUM_OF_PROCESSORS) as pool:
-      result = pool.map(mpfunc, N_ranges)
+      result = pool.starmap(mpfunc, zip(test_indexes, N_ranges))
       print(result)
     raise RuntimeError('break point')
     for i in range(self.config.N):
