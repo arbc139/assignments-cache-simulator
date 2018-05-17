@@ -136,9 +136,9 @@ def run(commands):
     if trace['type'] not in ACCESS_TYPE.values():
       continue
     if trace['type'] == ACCESS_TYPE['inst_read']:
-      cache_L1_inst.access(trace)
+      cache_L1_inst.access_parallel(trace)
     else:
-      cache_L1_data.access(trace)
+      cache_L1_data.access_parallel(trace)
 
   print('Caching result')
   print('L1 inst cache')
