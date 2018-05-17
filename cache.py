@@ -125,7 +125,7 @@ class Cache:
         max_LRU_count = self.LRU_count[cache_index][j]
         max_LRU_j = j
 
-    self.cachelines[cache_index][max_LRU_j] = cache_tag
+    self.cachelines[cache_index][max_LRU_j].tag = cache_tag
     self.LRU_count[cache_index][max_LRU_j] = 0
 
     if trace['type'] == ACCESS_TYPE['inst_read']:
