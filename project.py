@@ -131,7 +131,8 @@ def run(commands):
   print('Start to run caching')
   index = 0
   for trace in traces:
-    print('trace #:', index)
+    if index % 10000 == 0:
+      print('trace #:', index)
     index += 1
     if trace['type'] not in ACCESS_TYPE.values():
       continue
