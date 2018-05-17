@@ -48,6 +48,7 @@
 
 import json
 import trace_parser
+from cache import Cache
 from simulator_config import CacheConfig
 from utils import check_raw_configs
 
