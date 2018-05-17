@@ -2,6 +2,7 @@
 import sys
 
 import hw5
+import project
 from utils import parse_commands
 
 def main():

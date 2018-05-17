@@ -46,6 +46,7 @@
 #   * for (b), provide simulation results on given benchmarks
 #   * show impact on each design parameter you applied
 
+import json
 import trace_parser
 from simulator_config import CacheConfig
 from utils import check_raw_configs

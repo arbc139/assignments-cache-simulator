@@ -40,8 +40,7 @@ class SimulatorConfig:
     return (cache_index, cache_tag)
 
 class CacheConfig(SimulatorConfig):
-  def __init__(self, C, L, K, N, BIT_SIZE, input_label="", HIT_TIME, \
-               MISS_PENALTY):
+  def __init__(self, C, L, K, N, BIT_SIZE, input_label, HIT_TIME, MISS_PENALTY):
     SimulatorConfig.__init__(self, C, L, K, N, BIT_SIZE, input_label)
     self.HIT_TIME = HIT_TIME
     self.MISS_PENALTY = MISS_PENALTY

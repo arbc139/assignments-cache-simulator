@@ -1,4 +1,6 @@
 
+import humanfriendly
+
 # Command parser
 def parse_commands(argv, configs):
   from optparse import OptionParser
