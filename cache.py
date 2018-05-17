@@ -106,14 +106,11 @@ class Cache:
       )
       for i in range(NUM_OF_PROCESSORS)
     ]
-    test_indexes = [1, 2, 3, 4]
     with Pool(processes=NUM_OF_PROCESSORS) as pool:
-      result = pool.starmap(mpfunc, zip(test_indexes, N_ranges))
-      print(result)
+      result = pool.starmap(self.increase_LRU_parallel, N_ranges)
+      self.LRU_count = [elem for elem in sublist for sublist in result]
+      print(LRU_count)
     raise RuntimeError('break point')
-    for i in range(self.config.N):
-      for j in range(self.config.K):
-        self.LRU_count[i][j] += 1
 
     # Hit case!
     for j in range(self.config.K):
