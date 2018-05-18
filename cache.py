@@ -1,29 +1,7 @@
 
 import numpy as np
-import time
-from multiprocessing import Pool
 
-# CACHE READ TYPE
-ACCESS_TYPE = {
-  'DATA_READ': 0,
-  'DATA_WRITE': 1,
-  'INST_READ': 2,
-}
-
-# Cache prefetch scheme types
-PREFETCH_SCHEME_TYPE = {
-  'NONE': 0,
-  # TODO(totorody): Implements other prefetch schemes...
-}
-
-# Cache replacement scheme types
-REPLACEMENT_POLICY_TYPE = {
-  'LRU': 0,
-  # TODO(totorody): Implements other replacement schemes...
-}
-
-# Number of processors (To improve performance)
-NUM_OF_PROCESSORS = 4
+import constant
 
 class CacheLine:
   # Members:
@@ -63,7 +41,8 @@ class Cache:
   def select_victim(self, cache_index):
     victim_j = 0
 
-    if (self.config.replacement_policy == REPLACEMENT_POLICY_TYPE['LRU']):
+    replacement_policy = self.config.replacement_policy
+    if replacement_policy == constants.REPLACEMENT_POLICY_TYPE['LRU']:
       # LRU method.
       max_LRU_count = 0
       for j in range(self.config.K):
@@ -93,11 +72,11 @@ class Cache:
     self.cachelines[cache_index][victim_j].tag = cache_tag
     self.LRU_count[cache_index][victim_j] = 0
 
-    if trace['type'] == ACCESS_TYPE['INST_READ']:
+    if trace['type'] == constants.ACCESS_TYPE['INST_READ']:
       self.counts['inst_miss'] += 1
-    elif trace['type'] == ACCESS_TYPE['DATA_READ']:
+    elif trace['type'] == constants.ACCESS_TYPE['DATA_READ']:
       self.counts['data_miss'] += 1
-    elif trace['type'] == ACCESS_TYPE['DATA_WRITE']:
+    elif trace['type'] == constants.ACCESS_TYPE['DATA_WRITE']:
       self.counts['write'] += 1
 
     if self.low_cache:

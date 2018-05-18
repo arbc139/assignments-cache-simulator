@@ -49,35 +49,20 @@ import json
 import math
 import random
 import sys
+import multiprocessing as mp
+
+import constants
+import trace_parser
 from simulator_config import SimulatorConfig
 from cache import CacheLine
-import trace_parser
 from csv_manager import CsvManager
-import multiprocessing as mp
 from functools import partial
 from utils import check_raw_configs
 
-# 64 bit machine
-BIT_SIZE = 64
 # Assumes to set '1'
 HIT_TIME = 1
 # Assumes to set '20'
 MISS_PENALTY = 20
-
-INPUT_FOLDER_PATH = 'trace-files/'
-OUTPUT_FOLDER_PATH = 'output/'
-
-# Cache Access Types
-ACCESS_TYPE = {
-  'data_read': 0,
-  'data_write': 1,
-  'inst_read': 2,
-}
-
-"""
-def populate_output_file_label(input_label):
-  return '%s_results.csv' % input_label
-"""
 
 def populate_output_file_label(input_label, C, L, K, N):
   return '%s_(C_%s)_(L_%s)_(K_%s)_(N_%s)_results.csv' % (input_label, C, L, K, N)
@@ -89,12 +74,12 @@ def run_all(commands):
   check_raw_configs(raw_configs)
 
   print('INPUT:', commands.input_file_label)
-  input_file = INPUT_FOLDER_PATH + commands.input_file_label
+  input_file = constants.INPUT_FOLDER_PATH + commands.input_file_label
 
   # Parse trace file to programmable.
   traces = []
   with open(input_file, 'r') as trace_file:
-    traces = trace_parser.parse(trace_file, BIT_SIZE)
+    traces = trace_parser.parse(trace_file, constants.BIT_SIZE)
 
   # Run in multi-process
   pool = mp.Pool(len(raw_configs))
@@ -108,13 +93,13 @@ def multiprocess(traces, commands, raw_config):
     L=raw_config['L'],
     K=raw_config['K'],
     N=raw_config['N'],
-    BIT_SIZE=BIT_SIZE,
+    BIT_SIZE=constants.BIT_SIZE,
     input_label=commands.input_file_label,
   )
   simulation_results = run(traces, config)
 
   # Open CSV file to write...
-  output_file = OUTPUT_FOLDER_PATH + populate_output_file_label(
+  output_file = constants.OUTPUT_FOLDER_PATH + populate_output_file_label(
     commands.input_file_label,
     C=raw_config['C'],
     L=raw_config['L'],
@@ -158,7 +143,7 @@ def simulate(traces, cache, config):
     'access_count': 0,
   }
   for trace in traces:
-    if trace['type'] not in ACCESS_TYPE.values():
+    if trace['type'] not in constants.ACCESS_TYPE.values():
       continue
 
     result['access_count'] += 1
@@ -169,11 +154,11 @@ def simulate(traces, cache, config):
     if config.CACHE_INDEX == 0:
       cache_index = 0
     else:
-      start = BIT_SIZE - config.CACHE_INDEX - config.BYTE_SELECT
-      end = BIT_SIZE - config.BYTE_SELECT
+      start = constants.BIT_SIZE - config.CACHE_INDEX - config.BYTE_SELECT
+      end = constants.BIT_SIZE - config.BYTE_SELECT
       cache_index = int(address[start:end], 2)
     # Extracts Cache Tag from Address...
-    end = BIT_SIZE - config.CACHE_INDEX - config.BYTE_SELECT
+    end = constants.BIT_SIZE - config.CACHE_INDEX - config.BYTE_SELECT
     cache_tag = int(address[:end])
 
     # Cache Hit

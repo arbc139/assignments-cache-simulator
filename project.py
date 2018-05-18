@@ -47,64 +47,41 @@
 #   * show impact on each design parameter you applied
 
 import json
+
+import constants
 import trace_parser
 from cache import Cache
 from simulator_config import CacheConfig
 from utils import check_raw_configs
 
-# 64 Bit machine
-BIT_SIZE = 64
-
-INPUT_FOLDER_PATH = 'trace-files/'
-OUTPUT_FOLDER_PATH = 'output/'
-
-# Cache read types
-ACCESS_TYPE = {
-  'DATA_READ': 0,
-  'DATA_WRITE': 1,
-  'INST_READ': 2,
-}
-
-# Cache prefetch scheme types
-PREFETCH_SCHEME_TYPE = {
-  'NONE': 0,
-  # TODO(totorody): Implements other prefetch schemes...
-}
-
-# Cache replacement scheme types
-REPLACEMENT_POLICY_TYPE = {
-  'LRU': 0,
-  # TODO(totorody): Implements other replacement schemes...
-}
-
 def run(commands):
   # Config for L1 I/D, L2 (Fixed)
   config_L1_inst = CacheConfig(
     C='32KB', L='64B', K=1, N=512,
-    BIT_SIZE=BIT_SIZE,
+    BIT_SIZE=constants.BIT_SIZE,
     input_label=commands.input_file_label,
     HIT_TIME=4,
     MISS_PENALTY=16,
-    prefetch_scheme=PREFETCH_SCHEME_TYPE['NONE'],
-    replacement_policy=REPLACEMENT_POLICY_TYPE['LRU'],
+    prefetch_scheme=constants.PREFETCH_SCHEME_TYPE['NONE'],
+    replacement_policy=constants.REPLACEMENT_POLICY_TYPE['LRU'],
   )
   config_L1_data = CacheConfig(
     C='32KB', L='64B', K=1, N=512,
-    BIT_SIZE=BIT_SIZE,
+    BIT_SIZE=constants.BIT_SIZE,
     input_label=commands.input_file_label,
     HIT_TIME=4,
     MISS_PENALTY=16,
-    prefetch_scheme=PREFETCH_SCHEME_TYPE['NONE'],
-    replacement_policy=REPLACEMENT_POLICY_TYPE['LRU'],
+    prefetch_scheme=constants.PREFETCH_SCHEME_TYPE['NONE'],
+    replacement_policy=constants.REPLACEMENT_POLICY_TYPE['LRU'],
   )
   config_L2 = CacheConfig(
     C='256KB', L='64B', K=8, N=512,
-    BIT_SIZE=BIT_SIZE,
+    BIT_SIZE=constants.BIT_SIZE,
     input_label=commands.input_file_label,
     HIT_TIME=16,
     MISS_PENALTY=32,
-    prefetch_scheme=PREFETCH_SCHEME_TYPE['NONE'],
-    replacement_policy=REPLACEMENT_POLICY_TYPE['LRU'],
+    prefetch_scheme=constants.PREFETCH_SCHEME_TYPE['NONE'],
+    replacement_policy=constants.REPLACEMENT_POLICY_TYPE['LRU'],
   )
 
   raw_configs_L3 = []
@@ -124,19 +101,19 @@ def run(commands):
   # Config for L3 (Dynamic)
   config_L3 = CacheConfig(
     C='2MB', L='64B', K=1, N=32768,
-    BIT_SIZE=BIT_SIZE,
+    BIT_SIZE=constants.BIT_SIZE,
     input_label=commands.input_file_label,
     HIT_TIME=32,
     MISS_PENALTY=120,
-    prefetch_scheme=PREFETCH_SCHEME_TYPE['NONE'],
-    replacement_policy=REPLACEMENT_POLICY_TYPE['LRU'],
+    prefetch_scheme=constants.PREFETCH_SCHEME_TYPE['NONE'],
+    replacement_policy=constants.REPLACEMENT_POLICY_TYPE['LRU'],
   )
 
-  input_file = INPUT_FOLDER_PATH + commands.input_file_label
+  input_file = constants.INPUT_FOLDER_PATH + commands.input_file_label
   # Parse trace file to programmable.
   traces = []
   with open(input_file, 'r') as trace_file:
-    traces = trace_parser.parse(trace_file, BIT_SIZE)
+    traces = trace_parser.parse(trace_file, constants.BIT_SIZE)
 
   # TODO(totorody): Implements to run caches
   cache_L1_inst = Cache(config_L1_inst)
@@ -154,9 +131,9 @@ def run(commands):
     if index % 10000 == 0:
       print('trace #:', index)
     index += 1
-    if trace['type'] not in ACCESS_TYPE.values():
+    if trace['type'] not in constants.ACCESS_TYPE.values():
       continue
-    if trace['type'] == ACCESS_TYPE['INST_READ']:
+    if trace['type'] == constants.ACCESS_TYPE['INST_READ']:
       cache_L1_inst.access(trace)
     else:
       cache_L1_data.access(trace)
