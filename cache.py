@@ -1,6 +1,7 @@
 
 import numpy as np
 import math
+import random
 
 import constants
 
@@ -59,6 +60,12 @@ class Cache:
           min_LRU_count = self.LRU_count[cache_index][j]
           victim_j = j
       return victim_j
+    elif replacement_policy == constants.REPLACEMENT_POLICY_TYPE['RANDOM']:
+      # Random method.
+      for j in range(self.config.K):
+        if not self.cachelines[cache_index][j].valid:
+          return j
+      return random.randrange(0, self.config.K)
     else:
       raise RuntimeError('Other replacement policy is not implemented...')
 
@@ -78,6 +85,7 @@ class Cache:
 
     # Miss case!
     victim_j = self.select_victim(cache_index)
+    self.cachelines[cache_index][victim_j].valid = True
     self.cachelines[cache_index][victim_j].tag = cache_tag
     self.LRU_count[cache_index][victim_j] = 0
 

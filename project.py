@@ -106,7 +106,7 @@ def run(commands):
     HIT_TIME=32,
     MISS_PENALTY=120,
     prefetch_scheme=constants.PREFETCH_SCHEME_TYPE['NONE'],
-    replacement_policy=constants.REPLACEMENT_POLICY_TYPE['MRU'],
+    replacement_policy=constants.REPLACEMENT_POLICY_TYPE['RANDOM'],
   )
 
   input_file = constants.INPUT_FOLDER_PATH + commands.input_file_label

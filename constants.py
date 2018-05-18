@@ -21,7 +21,8 @@ PREFETCH_SCHEME_TYPE = {
 
 # Cache replacement scheme types
 REPLACEMENT_POLICY_TYPE = {
-  'LRU': 0,   # Least Recently Used
-  'MRU': 1,   # Most Recently Used
+  'LRU': 0,     # Least Recently Used
+  'MRU': 1,     # Most Recently Used
+  'RANDOM': 2,  # Random
   # TODO(totorody): Implements other replacement schemes...
 }
