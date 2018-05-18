@@ -1,5 +1,6 @@
 
 import humanfriendly
+import itertools
 
 # Command parser
 def parse_commands(argv, configs):
@@ -20,3 +21,6 @@ def check_raw_configs(raw_configs):
 
     if C != L * K * N:
       raise RuntimeError('Invalid matching L, K, N, C parameters')
+
+def cartesian_dict_product(dicts):
+  return [dict(zip(dicts, x)) for x in itertools.product(*dicts.values())]

@@ -84,9 +84,23 @@ def run(commands):
     replacement_policy=constants.REPLACEMENT_POLICY_TYPE['LRU'],
   )
 
-  raw_configs_L3 = []
+  raw_configs_dicts_L3 = {}
   with open('configs/project.json', 'r') as raw_config_file:
-    raw_configs_L3 = json.load(raw_config_file)
+    raw_configs_dicts_L3 = json.load(raw_config_file)
+  raw_configs_L3 = [
+    {
+      'C': '2MB',
+      'L': '64B',
+      'K': raw_config['K'],
+      'N': raw_config['N'],
+      'PREFETCH': raw_config['PREFETCH'],
+      'REPLACEMENT': raw_config['REPLACEMENT'],
+    }
+    if (raw_config['K'] * raw_config['N']) == 32768
+    for raw_config in cartesian_dict_product(raw_configs_dicts_L3)
+  ]
+  print(raw_configs_L3)
+  raise RuntimeError('break')
   check_raw_configs([
     {
       'C': '2MB',

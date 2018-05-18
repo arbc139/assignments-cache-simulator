@@ -16,6 +16,8 @@ ACCESS_TYPE = {
 # Cache prefetch scheme types
 PREFETCH_SCHEME_TYPE = {
   'NONE': 0,
+  'STREAM_BUFFER': 1,
+  'COMPILER_DIRECTED': 2,
   # TODO(totorody): Implements other prefetch schemes...
 }
 
