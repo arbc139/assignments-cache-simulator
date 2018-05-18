@@ -100,7 +100,7 @@ def run(commands):
   # TODO(totorody): Iterates variable configs to config_L3.
   # Config for L3 (Dynamic)
   config_L3 = CacheConfig(
-    C='2MB', L='64B', K=1, N=32768,
+    C='2MB', L='64B', K=16, N=2048,
     BIT_SIZE=constants.BIT_SIZE,
     input_label=commands.input_file_label,
     HIT_TIME=32,
