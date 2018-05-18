@@ -52,12 +52,17 @@ import constants
 import trace_parser
 from cache import Cache
 from simulator_config import CacheConfig
-from utils import check_raw_configs
+from utils import check_raw_config, validate_raw_configs, cartesian_dict_product
+
+L1_CACHE_SIZE = '32KB'
+L2_CACHE_SIZE = '256KB'
+L3_CACHE_SIZE = '2MB'
+BLOCK_SIZE = '64B'
 
 def run(commands):
   # Config for L1 I/D, L2 (Fixed)
   config_L1_inst = CacheConfig(
-    C='32KB', L='64B', K=1, N=512,
+    C=L1_CACHE_SIZE, L=BLOCK_SIZE, K=1, N=512,
     BIT_SIZE=constants.BIT_SIZE,
     input_label=commands.input_file_label,
     HIT_TIME=4,
@@ -66,7 +71,7 @@ def run(commands):
     replacement_policy=constants.REPLACEMENT_POLICY_TYPE['LRU'],
   )
   config_L1_data = CacheConfig(
-    C='32KB', L='64B', K=1, N=512,
+    C=L1_CACHE_SIZE, L=BLOCK_SIZE, K=1, N=512,
     BIT_SIZE=constants.BIT_SIZE,
     input_label=commands.input_file_label,
     HIT_TIME=4,
@@ -75,7 +80,7 @@ def run(commands):
     replacement_policy=constants.REPLACEMENT_POLICY_TYPE['LRU'],
   )
   config_L2 = CacheConfig(
-    C='256KB', L='64B', K=8, N=512,
+    C=L2_CACHE_SIZE, L=BLOCK_SIZE, K=8, N=512,
     BIT_SIZE=constants.BIT_SIZE,
     input_label=commands.input_file_label,
     HIT_TIME=16,
@@ -89,32 +94,27 @@ def run(commands):
     raw_configs_dicts_L3 = json.load(raw_config_file)
   raw_configs_L3 = [
     {
-      'C': '2MB',
-      'L': '64B',
+      'C': L3_CACHE_SIZE,
+      'L': BLOCK_SIZE,
       'K': raw_config['K'],
       'N': raw_config['N'],
       'PREFETCH': raw_config['PREFETCH'],
       'REPLACEMENT': raw_config['REPLACEMENT'],
     }
-    if (raw_config['K'] * raw_config['N']) == 32768
     for raw_config in cartesian_dict_product(raw_configs_dicts_L3)
-  ]
-  print(raw_configs_L3)
-  raise RuntimeError('break')
-  check_raw_configs([
-    {
-      'C': '2MB',
-      'L': '64B',
+    if check_raw_config({
+      'C': L3_CACHE_SIZE,
+      'L': BLOCK_SIZE,
       'K': raw_config['K'],
       'N': raw_config['N'],
-    }
-    for raw_config in raw_configs_L3
-  ])
+    })
+  ]
+  validate_raw_configs(raw_configs_L3)
 
   # TODO(totorody): Iterates variable configs to config_L3.
   # Config for L3 (Dynamic)
   config_L3 = CacheConfig(
-    C='2MB', L='64B', K=16, N=2048,
+    C=L3_CACHE_SIZE, L=BLOCK_SIZE, K=16, N=2048,
     BIT_SIZE=constants.BIT_SIZE,
     input_label=commands.input_file_label,
     HIT_TIME=32,

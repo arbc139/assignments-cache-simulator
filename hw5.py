@@ -57,7 +57,7 @@ from simulator_config import SimulatorConfig
 from cache import CacheLine
 from csv_manager import CsvManager
 from functools import partial
-from utils import check_raw_configs
+from utils import validate_raw_configs
 
 # Assumes to set '1'
 HIT_TIME = 1
@@ -71,7 +71,7 @@ def run_all(commands):
   raw_configs = []
   with open('configs/hw5.json', 'r') as raw_config_file:
     raw_configs = json.load(raw_config_file)
-  check_raw_configs(raw_configs)
+  validate_raw_configs(raw_configs)
 
   print('INPUT:', commands.input_file_label)
   input_file = constants.INPUT_FOLDER_PATH + commands.input_file_label
