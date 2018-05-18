@@ -24,5 +24,6 @@ REPLACEMENT_POLICY_TYPE = {
   'LRU': 0,     # Least Recently Used
   'MRU': 1,     # Most Recently Used
   'RANDOM': 2,  # Random
+  'LFU': 3,     # Least Frequently Used
   # TODO(totorody): Implements other replacement schemes...
 }
