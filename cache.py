@@ -2,7 +2,7 @@
 import numpy as np
 import math
 
-import constant
+import constants
 
 class CacheLine:
   # Members:
