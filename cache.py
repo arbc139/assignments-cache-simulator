@@ -28,10 +28,12 @@ class Cache:
       'inst_miss': 0,
       'write': 0,
     }
-    LRU_count = [
+    self.LRU_count = np.array([
       [0 for j in range(config.K)] for i in range(config.N)
-    ]
-    self.LRU_count = np.array(LRU_count)
+    ])
+    self.LFU_count = np.array([
+      [0 for j in range(config.K)] for i in range(config.N)
+    ])
     self.cachelines = [
       [CacheLine(0, False) for j in range(config.K)] for i in range(config.N)
     ]
@@ -42,8 +44,8 @@ class Cache:
 
   def select_victim(self, cache_index):
     victim_j = 0
-
     replacement_policy = self.config.replacement_policy
+
     if replacement_policy == constants.REPLACEMENT_POLICY_TYPE['LRU']:
       # LRU method.
       max_LRU_count = 0
@@ -66,6 +68,14 @@ class Cache:
         if not self.cachelines[cache_index][j].valid:
           return j
       return random.randrange(0, self.config.K)
+    elif replacement_policy == constants.REPLACEMENT_POLICY_TYPE['LFU']:
+      # LFU method.
+      min_LFU_count = math.inf
+      for j in range(self.config.K):
+        if self.LFU_count[cache_index][j] < min_LFU_count:
+          min_LFU_count = self.LFU_count[cache_index][j]
+          victim_j = j
+      return victim_j
     else:
       raise RuntimeError('Other replacement policy is not implemented...')
 
@@ -81,6 +91,7 @@ class Cache:
       if self.cachelines[cache_index][j].tag == cache_tag:
         self.counts['hit'] += 1
         self.LRU_count[cache_index][j] = 0
+        self.LFU_count[cache_index][j] += 1
         return True
 
     # Miss case!
@@ -88,6 +99,7 @@ class Cache:
     self.cachelines[cache_index][victim_j].valid = True
     self.cachelines[cache_index][victim_j].tag = cache_tag
     self.LRU_count[cache_index][victim_j] = 0
+    self.LFU_count[cache_index][victim_j] = 0
 
     if trace['type'] == constants.ACCESS_TYPE['INST_READ']:
       self.counts['inst_miss'] += 1
