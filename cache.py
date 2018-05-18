@@ -53,16 +53,7 @@ class Cache:
     cache_index = masked[0]
     cache_tag = masked[1]
 
-    start_t = time.time()
     self.LRU_count = self.LRU_count + 1
-    end_t = time.time()
-    print('numpy running time:', end_t - start_t)
-    start_t = time.time()
-    for i in range(self.config.N):
-      for j in range(self.config.K):
-        self.LRU_count[i][j] += 1
-    end_t = time.time()
-    print('simple loop running time:', end_t - start_t)
 
     # Hit case!
     for j in range(self.config.K):
