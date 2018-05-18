@@ -1,5 +1,6 @@
 
 import numpy as np
+import math
 
 import constant
 
@@ -48,6 +49,14 @@ class Cache:
       for j in range(self.config.K):
         if self.LRU_count[cache_index][j] > max_LRU_count:
           max_LRU_count = self.LRU_count[cache_index][j]
+          victim_j = j
+      return victim_j
+    elif replacement_policy == constants.REPLACEMENT_POLICY_TYPE['MRU']:
+      # MRU method.
+      min_LRU_count = math.inf
+      for j in range(self.config.K):
+        if self.LRU_count[cache_index][j] < min_LRU_count:
+          min_LRU_count = self.LRU_count[cache_index][j]
           victim_j = j
       return victim_j
     else:
