@@ -5,9 +5,21 @@ from multiprocessing import Pool
 
 # CACHE READ TYPE
 ACCESS_TYPE = {
-  'data_read': 0,
-  'data_write': 1,
-  'inst_read': 2,
+  'DATA_READ': 0,
+  'DATA_WRITE': 1,
+  'INST_READ': 2,
+}
+
+# Cache prefetch scheme types
+PREFETCH_SCHEME_TYPE = {
+  'NONE': 0,
+  # TODO(totorody): Implements other prefetch schemes...
+}
+
+# Cache replacement scheme types
+REPLACEMENT_POLICY_TYPE = {
+  'LRU': 0,
+  # TODO(totorody): Implements other replacement schemes...
 }
 
 # Number of processors (To improve performance)
@@ -48,6 +60,20 @@ class Cache:
   def set_low_cache(self, cache):
     self.low_cache = cache
 
+  def select_victim(self, cache_index):
+    victim_j = 0
+
+    if (self.config.replacement_policy == REPLACEMENT_POLICY_TYPE['LRU']):
+      # LRU method.
+      max_LRU_count = 0
+      for j in range(self.config.K):
+        if self.LRU_count[cache_index][j] > max_LRU_count:
+          max_LRU_count = self.LRU_count[cache_index][j]
+          victim_j = j
+      return victim_j
+    else:
+      raise RuntimeError('Other replacement policy is not implemented...')
+
   def access(self, trace):
     masked = self.config.masking(trace['address'])
     cache_index = masked[0]
@@ -63,21 +89,15 @@ class Cache:
         return True
 
     # Miss case!
-    max_LRU_count = 0
-    max_LRU_j = 0
-    for j in range(self.config.K):
-      if self.LRU_count[cache_index][j] > max_LRU_count:
-        max_LRU_count = self.LRU_count[cache_index][j]
-        max_LRU_j = j
+    victim_j = self.select_victim(cache_index)
+    self.cachelines[cache_index][victim_j].tag = cache_tag
+    self.LRU_count[cache_index][victim_j] = 0
 
-    self.cachelines[cache_index][max_LRU_j].tag = cache_tag
-    self.LRU_count[cache_index][max_LRU_j] = 0
-
-    if trace['type'] == ACCESS_TYPE['inst_read']:
+    if trace['type'] == ACCESS_TYPE['INST_READ']:
       self.counts['inst_miss'] += 1
-    elif trace['type'] == ACCESS_TYPE['data_read']:
+    elif trace['type'] == ACCESS_TYPE['DATA_READ']:
       self.counts['data_miss'] += 1
-    elif trace['type'] == ACCESS_TYPE['data_write']:
+    elif trace['type'] == ACCESS_TYPE['DATA_WRITE']:
       self.counts['write'] += 1
 
     if self.low_cache:

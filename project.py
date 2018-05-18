@@ -58,11 +58,23 @@ BIT_SIZE = 64
 INPUT_FOLDER_PATH = 'trace-files/'
 OUTPUT_FOLDER_PATH = 'output/'
 
-# CACHE READ TYPE
+# Cache read types
 ACCESS_TYPE = {
-  'data_read': 0,
-  'data_write': 1,
-  'inst_read': 2,
+  'DATA_READ': 0,
+  'DATA_WRITE': 1,
+  'INST_READ': 2,
+}
+
+# Cache prefetch scheme types
+PREFETCH_SCHEME_TYPE = {
+  'NONE': 0,
+  # TODO(totorody): Implements other prefetch schemes...
+}
+
+# Cache replacement scheme types
+REPLACEMENT_POLICY_TYPE = {
+  'LRU': 0,
+  # TODO(totorody): Implements other replacement schemes...
 }
 
 def run(commands):
@@ -73,6 +85,8 @@ def run(commands):
     input_label=commands.input_file_label,
     HIT_TIME=4,
     MISS_PENALTY=16,
+    prefetch_scheme=PREFETCH_SCHEME_TYPE['NONE'],
+    replacement_policy=REPLACEMENT_POLICY_TYPE['LRU'],
   )
   config_L1_data = CacheConfig(
     C='32KB', L='64B', K=1, N=512,
@@ -80,6 +94,8 @@ def run(commands):
     input_label=commands.input_file_label,
     HIT_TIME=4,
     MISS_PENALTY=16,
+    prefetch_scheme=PREFETCH_SCHEME_TYPE['NONE'],
+    replacement_policy=REPLACEMENT_POLICY_TYPE['LRU'],
   )
   config_L2 = CacheConfig(
     C='256KB', L='64B', K=8, N=512,
@@ -87,6 +103,8 @@ def run(commands):
     input_label=commands.input_file_label,
     HIT_TIME=16,
     MISS_PENALTY=32,
+    prefetch_scheme=PREFETCH_SCHEME_TYPE['NONE'],
+    replacement_policy=REPLACEMENT_POLICY_TYPE['LRU'],
   )
 
   raw_configs_L3 = []
@@ -110,6 +128,8 @@ def run(commands):
     input_label=commands.input_file_label,
     HIT_TIME=32,
     MISS_PENALTY=120,
+    prefetch_scheme=PREFETCH_SCHEME_TYPE['NONE'],
+    replacement_policy=REPLACEMENT_POLICY_TYPE['LRU'],
   )
 
   input_file = INPUT_FOLDER_PATH + commands.input_file_label
@@ -136,7 +156,7 @@ def run(commands):
     index += 1
     if trace['type'] not in ACCESS_TYPE.values():
       continue
-    if trace['type'] == ACCESS_TYPE['inst_read']:
+    if trace['type'] == ACCESS_TYPE['INST_READ']:
       cache_L1_inst.access(trace)
     else:
       cache_L1_data.access(trace)
