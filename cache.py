@@ -123,7 +123,7 @@ class Cache:
 
     miss_panelty = None
     if not self.low_cache:
-      miss_panelty = self.config.MISS_PANELTY
+      miss_panelty = self.config.MISS_PENALTY
     else:
       miss_panelty = self.low_cache.get_amat()
 
