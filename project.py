@@ -135,8 +135,8 @@ def run(commands):
     input_label=commands.input_file_label,
     HIT_TIME=32,
     MISS_PENALTY=120,
-    prefetch_scheme=raw_config_L3['PREFETCH'],
-    replacement_policy=raw_config_L3['REPLACEMENT'],
+    prefetch_scheme=constants.PREFETCH_SCHEME_TYPE[raw_config_L3['PREFETCH']],
+    replacement_policy=constants.REPLACEMENT_POLICY_TYPE[raw_config_L3['REPLACEMENT']],
   )
 
   input_file = constants.INPUT_FOLDER_PATH + commands.input_file_label
