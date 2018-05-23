@@ -7,6 +7,9 @@ import random
 import constants
 import trace_parser
 
+# Prefetches instructions 512 addresses...
+INST_PREFETCH_AMOUNT = 512
+
 class CacheLine:
   # Members:
   # <int> tag
@@ -47,27 +50,25 @@ class Cache:
 
   def check_prefetch_buffer(self, address):
     int_address = trace_parser.parse_bin_address_to_int(address)
-    if int_address in prefetch_buffer:
+    if int_address in self.prefetch_buffer:
       print('Find in prefetch buffer!')
-    return int_address in prefetch_buffer
+    return int_address in self.prefetch_buffer
 
-  def prefetch_inst(self):
-    # Prefetches instructions 32 addresses...
-    INST_PREFETCH_AMOUNT = 32
+  def prefetch_inst(self, address):
     self.prefetch_buffer = set()
     int_address = trace_parser.parse_bin_address_to_int(address)
     for i in range(1, INST_PREFETCH_AMOUNT + 1):
-      self.prefetch_buffer.add(int_address + 1)
+      self.prefetch_buffer.add(int_address + i)
 
-  def prefetch(self, access_type):
-    if prefetch_scheme == constants.PREFETCH_SCHEME_TYPE['NONE']:
+  def prefetch(self, access_type, address):
+    if self.config.prefetch_scheme == constants.PREFETCH_SCHEME_TYPE['NONE']:
       return
 
-    if prefetch_scheme == constants.PREFETCH_SCHEME_TYPE['INST']:
+    if self.config.prefetch_scheme == constants.PREFETCH_SCHEME_TYPE['INST']:
       # Prefetch on instruction mode only
       if access_type != constants.ACCESS_TYPE['INST_READ']:
         return
-      self.prefetch_inst()
+      self.prefetch_inst(address)
     else:
       raise RuntimeError('Other prefetch scheme is not implemented...')
 
@@ -143,7 +144,7 @@ class Cache:
 
     # Miss case!
     # Apply prefetches schemes...
-    self.prefetch(trace['type'])
+    self.prefetch(trace['type'], trace['address'])
 
     # Apply replacement strategy...
     victim_j = self.select_victim(cache_index)
