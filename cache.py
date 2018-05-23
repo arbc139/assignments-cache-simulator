@@ -153,3 +153,4 @@ class Cache:
     results['Data-Read-Miss-Count'] = self.counts['data_miss']
     results['Data-Write-Miss-Count'] = self.counts['write_miss']
     results['Access-Count'] = total_count
+    return results
