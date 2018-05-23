@@ -176,10 +176,10 @@ def run(commands):
       + populate_output_file_label(config_L1_inst)
   output_file_data = constants.OUTPUT_FOLDER_PATH \
       + populate_output_file_label(config_L1_data)
-  with open(output_file_inst) as csv_file:
+  with open(output_file_inst, 'w+') as csv_file:
     csv_manager = CsvManager(csv_file, inst_result.keys())
     csv_manager.write_row(inst_result)
 
-  with open(output_file_data) as csv_file:
+  with open(output_file_data, 'w+') as csv_file:
     csv_manager = CsvManager(csv_file, data_result.keys())
     csv_manager.write_row(data_result)
