@@ -6,9 +6,7 @@ import random
 
 import constants
 import trace_parser
-
-# Prefetches instructions 512 addresses...
-INST_PREFETCH_AMOUNT = 512
+from prefetcher import Prefetcher
 
 class CacheLine:
   # Members:
@@ -42,35 +40,64 @@ class Cache:
     self.cachelines = [
       [CacheLine(0, False) for j in range(config.K)] for i in range(config.N)
     ]
-    self.prefetch_buffer = set()   # Address list
+    self.set_prefetchers()
     self.low_cache = None
+
+  def set_prefetchers(self):
+    if self.config.prefetch_scheme == constants.PREFETCH_SCHEME_TYPE['NONE']:
+      return
+    elif self.config.prefetch_scheme == constants.PREFETCH_SCHEME_TYPE['INST']:
+      self.prefetcher_inst = Prefetcher(constants.PREFETCHER_TYPE['INST'])
+      return
+    elif self.config.prefetch_scheme == constants.PREFETCH_SCHEME_TYPE['DATA']:
+      self.prefetcher_data = Prefetcher(constants.PREFETCHER_TYPE['DATA'])
+      return
+    elif self.config.prefetch_scheme == constants.PREFETCH_SCHEME_TYPE['INST_DATA']:
+      self.prefetcher_inst = Prefetcher(constants.PREFETCHER_TYPE['INST'])
+      self.prefetcher_data = Prefetcher(constants.PREFETCHER_TYPE['DATA'])
+      return
 
   def set_low_cache(self, cache):
     self.low_cache = cache
 
-  def check_prefetch_buffer(self, address):
-    int_address = trace_parser.parse_bin_address_to_int(address)
-    if int_address in self.prefetch_buffer:
-      print('Find in prefetch buffer!')
-    return int_address in self.prefetch_buffer
-
-  def prefetch_inst(self, address):
-    self.prefetch_buffer = set()
-    int_address = trace_parser.parse_bin_address_to_int(address)
-    for i in range(1, INST_PREFETCH_AMOUNT + 1):
-      self.prefetch_buffer.add(int_address + i)
+  def check_prefetchers(self, access_type, address):
+    if not self.prefetcher_inst and not self.prefetcher_data:
+      # Prefetch check 'NONE'
+      return False
+    elif self.prefetcher_inst and not self.prefetcher_data:
+      # Prefetch check 'INST'
+      return self.prefetcher_inst.check(access_type, address)
+    elif not self.prefetcher_inst and self.prefetcher_data:
+      # Prefetch check 'DATA'
+      return self.prefetcher_data.check(access_type, address)
+    else:
+      # Prefetch check 'INST_DATA'
+      return self.prefetcher_inst.check(access_type, address) or \
+          self.prefetcher_data.check(access_type, address)
 
   def prefetch(self, access_type, address):
-    if self.config.prefetch_scheme == constants.PREFETCH_SCHEME_TYPE['NONE']:
+    if not self.prefetcher_inst and not self.prefetcher_data:
+      # Prefetches 'NONE'
       return
-
-    if self.config.prefetch_scheme == constants.PREFETCH_SCHEME_TYPE['INST']:
-      # Prefetch on instruction mode only
-      if access_type != constants.ACCESS_TYPE['INST_READ']:
-        return
-      self.prefetch_inst(address)
+    elif self.prefetcher_inst and not self.prefetcher_data:
+      # Prefetches 'INST'
+      if access_type == constants.ACCESS_TYPE['INST_READ']:
+        self.prefetcher_inst.prefetch(address)
+      return
+    elif not self.prefetcher_inst and self.prefetcher_data:
+      # Prefetches 'DATA'
+      if access_type == constants.ACCESS_TYPE['DATA_READ'] or \
+          access_type == constants.ACCESS_TYPE['DATA_WRITE']:
+        self.prefetcher_data.prefetch(address)
+      return
     else:
-      raise RuntimeError('Other prefetch scheme is not implemented...')
+      # Prefetches 'INST_DATA'
+      if access_type == constants.ACCESS_TYPE['INST_READ']:
+        self.prefetcher_inst.prefetch(address)
+      if access_type == constants.ACCESS_TYPE['DATA_READ'] or \
+          access_type == constants.ACCESS_TYPE['DATA_WRITE']:
+        self.prefetcher_data.prefetch(address)
+      return
 
   def select_victim(self, cache_index):
     victim_j = 0
@@ -130,7 +157,7 @@ class Cache:
     self.LRU_count = self.LRU_count + 1
 
     # Check prefetch buffer
-    if self.check_prefetch_buffer(trace['address']):
+    if self.check_prefetchers(trace['type'], trace['address']):
       victim_j = self.select_victim(cache_index)
       self.evict(cache_index, cache_tag, victim_j)
       self.hit(cache_index, victim_j)

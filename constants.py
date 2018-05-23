@@ -18,8 +18,16 @@ PREFETCH_SCHEME_TYPE = {
   'NONE': 0,
   'INST': 1,      # Instruction prefetch scheme
   'DATA': 2,      # Data prefetch scheme
-  'INST-DATA': 3, # Instruction & Data prefetch scheme (both)
+  'INST_DATA': 3, # Instruction & Data prefetch scheme (both)
   # TODO(totorody): Implements other prefetch schemes...
+}
+
+# Prefetches instructions 512 inst addresses...
+INST_PREFETCH_AMOUNT = 512
+
+PREFETCHER_TYPE = {
+  'INST': 0,
+  'DATA': 1,
 }
 
 def get_prefetch_scheme_label(prefetch_scheme_type_value):
