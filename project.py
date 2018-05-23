@@ -172,14 +172,9 @@ def run(commands):
   inst_result = cache_L1_inst.get_result('Inst')
   data_result = cache_L1_data.get_result('Data')
 
-  output_file_inst = constants.OUTPUT_FOLDER_PATH \
+  output_file = constants.OUTPUT_FOLDER_PATH \
       + populate_output_file_label(config_L1_inst)
-  output_file_data = constants.OUTPUT_FOLDER_PATH \
-      + populate_output_file_label(config_L1_data)
   with open(output_file_inst, 'w+') as csv_file:
     csv_manager = CsvManager(csv_file, inst_result.keys())
     csv_manager.write_row(inst_result)
-
-  with open(output_file_data, 'w+') as csv_file:
-    csv_manager = CsvManager(csv_file, data_result.keys())
     csv_manager.write_row(data_result)
