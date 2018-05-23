@@ -169,8 +169,8 @@ def run(commands):
       cache_L1_data.access(trace)
 
   print('Prints cache simulation results...')
-  inst_result = cache_L1_inst.get_result()
-  data_result = cache_L1_data.get_result()
+  inst_result = cache_L1_inst.get_result('Inst')
+  data_result = cache_L1_data.get_result('Data')
 
   output_file_inst = constants.OUTPUT_FOLDER_PATH \
       + populate_output_file_label(config_L1_inst)
