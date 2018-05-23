@@ -187,8 +187,12 @@ class Cache:
     results['L'] = humanfriendly.format_size(self.config.L, binary=True)
     results['K'] = self.config.K
     results['N'] = self.config.N
-    results['Prefetch'] = self.config.prefetch_scheme
-    results['Replacement'] = self.config.replacement_policy
+    results['Prefetch'] = constants.get_prefetch_scheme_label(
+      self.config.prefetch_scheme
+    )
+    results['Replacement'] = constants.get_replacement_policy_label(
+      self.config.replacement_policy
+    )
     total_count = self.counts['hit'] + self.counts['inst_miss'] \
         + self.counts['data_miss'] + self.counts['write_miss']
     results['Hit-Ratio'] = self.counts['hit'] / total_count

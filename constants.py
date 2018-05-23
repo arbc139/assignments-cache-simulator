@@ -22,6 +22,11 @@ PREFETCH_SCHEME_TYPE = {
   # TODO(totorody): Implements other prefetch schemes...
 }
 
+def get_prefetch_scheme_label(prefetch_scheme_type_value):
+  for key, value in PREFETCH_SCHEME_TYPE.items():
+    if value == prefetch_scheme_type_value:
+      return key
+
 # Cache replacement scheme types
 REPLACEMENT_POLICY_TYPE = {
   'LRU': 0,     # Least Recently Used
@@ -30,3 +35,8 @@ REPLACEMENT_POLICY_TYPE = {
   'LFU': 3,     # Least Frequently Used
   # TODO(totorody): Implements other replacement schemes...
 }
+
+def get_replacement_policy_label(replacement_policy_type_value):
+  for key, value in REPLACEMENT_POLICY_TYPE.items():
+    if value == replacement_policy_type_value:
+      return key
