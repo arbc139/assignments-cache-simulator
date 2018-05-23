@@ -135,7 +135,8 @@ def run(commands):
     input_label=commands.input_file_label,
     HIT_TIME=32,
     MISS_PENALTY=120,
-    prefetch_scheme=constants.PREFETCH_SCHEME_TYPE[raw_config_L3['PREFETCH']],
+    prefetch_scheme=constants.PREFETCH_SCHEME_TYPE['INST'],
+    # prefetch_scheme=constants.PREFETCH_SCHEME_TYPE[raw_config_L3['PREFETCH']],
     replacement_policy=constants.REPLACEMENT_POLICY_TYPE[raw_config_L3['REPLACEMENT']],
   )
 

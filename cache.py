@@ -5,6 +5,7 @@ import math
 import random
 
 import constants
+import trace_parser
 
 class CacheLine:
   # Members:
@@ -38,14 +39,46 @@ class Cache:
     self.cachelines = [
       [CacheLine(0, False) for j in range(config.K)] for i in range(config.N)
     ]
+    self.prefetch_buffer = set()   # Address list
     self.low_cache = None
 
   def set_low_cache(self, cache):
     self.low_cache = cache
 
+  def check_prefetch_buffer(self, address):
+    int_address = trace_parser.parse_bin_address_to_int(address)
+    if int_address in prefetch_buffer:
+      print('Find in prefetch buffer!')
+    return int_address in prefetch_buffer
+
+  def prefetch_inst(self):
+    # Prefetches instructions 32 addresses...
+    INST_PREFETCH_AMOUNT = 32
+    self.prefetch_buffer = set()
+    int_address = trace_parser.parse_bin_address_to_int(address)
+    for i in range(1, INST_PREFETCH_AMOUNT + 1):
+      self.prefetch_buffer.add(int_address + 1)
+
+  def prefetch(self, access_type):
+    if prefetch_scheme == constants.PREFETCH_SCHEME_TYPE['NONE']:
+      return
+
+    if prefetch_scheme == constants.PREFETCH_SCHEME_TYPE['INST']:
+      # Prefetch on instruction mode only
+      if access_type != constants.ACCESS_TYPE['INST_READ']:
+        return
+      self.prefetch_inst()
+    else:
+      raise RuntimeError('Other prefetch scheme is not implemented...')
+
   def select_victim(self, cache_index):
     victim_j = 0
     replacement_policy = self.config.replacement_policy
+
+    # Check empty cachelines...
+    for j in range(self.config.K):
+      if not self.cachelines[cache_index][j].valid:
+        return j
 
     if replacement_policy == constants.REPLACEMENT_POLICY_TYPE['LRU']:
       # LRU method.
@@ -65,9 +98,6 @@ class Cache:
       return victim_j
     elif replacement_policy == constants.REPLACEMENT_POLICY_TYPE['RANDOM']:
       # Random method.
-      for j in range(self.config.K):
-        if not self.cachelines[cache_index][j].valid:
-          return j
       return random.randrange(0, self.config.K)
     elif replacement_policy == constants.REPLACEMENT_POLICY_TYPE['LFU']:
       # LFU method.
@@ -80,6 +110,17 @@ class Cache:
     else:
       raise RuntimeError('Other replacement policy is not implemented...')
 
+  def evict(self, cache_index, cache_tag, victim_j):
+    self.cachelines[cache_index][victim_j].valid = True
+    self.cachelines[cache_index][victim_j].tag = cache_tag
+    self.LRU_count[cache_index][victim_j] = 0
+    self.LFU_count[cache_index][victim_j] = 0
+
+  def hit(self, cache_index, j):
+    self.counts['hit'] += 1
+    self.LRU_count[cache_index][j] = 0
+    self.LFU_count[cache_index][j] += 1
+
   def access(self, trace):
     masked = self.config.masking(trace['address'])
     cache_index = masked[0]
@@ -87,20 +128,26 @@ class Cache:
 
     self.LRU_count = self.LRU_count + 1
 
+    # Check prefetch buffer
+    if self.check_prefetch_buffer(trace['address']):
+      victim_j = self.select_victim(cache_index)
+      self.evict(cache_index, cache_tag, victim_j)
+      self.hit(cache_index, victim_j)
+      return True
+
     # Hit case!
     for j in range(self.config.K):
       if self.cachelines[cache_index][j].tag == cache_tag:
-        self.counts['hit'] += 1
-        self.LRU_count[cache_index][j] = 0
-        self.LFU_count[cache_index][j] += 1
+        self.hit(cache_index, j)
         return True
 
     # Miss case!
+    # Apply prefetches schemes...
+    self.prefetch(trace['type'])
+
+    # Apply replacement strategy...
     victim_j = self.select_victim(cache_index)
-    self.cachelines[cache_index][victim_j].valid = True
-    self.cachelines[cache_index][victim_j].tag = cache_tag
-    self.LRU_count[cache_index][victim_j] = 0
-    self.LFU_count[cache_index][victim_j] = 0
+    self.evict(cache_index, cache_tag, victim_j)
 
     if trace['type'] == constants.ACCESS_TYPE['INST_READ']:
       self.counts['inst_miss'] += 1
