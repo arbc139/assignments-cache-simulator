@@ -130,7 +130,7 @@ class Cache:
     return self.config.HIT_TIME \
         + miss_panelty * (inst_miss_ratio + data_miss_ratio + write_miss_ratio)
 
-  def get_result(self, cache_type):
+  def get_result(self, cache_type=None):
     results = {}
     results['Input'] = self.config.input_label
     results['Type'] = cache_type  # 'Data' or 'Inst'
