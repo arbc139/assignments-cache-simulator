@@ -174,7 +174,7 @@ def run(commands):
 
   output_file = constants.OUTPUT_FOLDER_PATH \
       + populate_output_file_label(config_L1_inst)
-  with open(output_file_inst, 'w+') as csv_file:
+  with open(output_file, 'w+') as csv_file:
     csv_manager = CsvManager(csv_file, inst_result.keys())
     csv_manager.write_row(inst_result)
     csv_manager.write_row(data_result)
