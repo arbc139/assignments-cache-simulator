@@ -51,6 +51,7 @@ import json
 import constants
 import trace_parser
 from cache import Cache
+from csv_manager import CsvManager
 from simulator_config import CacheConfig
 from utils import check_raw_config, validate_raw_configs, cartesian_dict_product
 
@@ -58,6 +59,17 @@ L1_CACHE_SIZE = '32KB'
 L2_CACHE_SIZE = '256KB'
 L3_CACHE_SIZE = '2MB'
 BLOCK_SIZE = '64B'
+
+def populate_output_file_label(config):
+  return '%s_(C_%s)_(L_%s)_(K_%s)_(N_%s)_(pre_%s)_(rep_%s)_results.csv' % (
+    config.input_label,
+    config.C,
+    config.L,
+    config.K,
+    config.N,
+    config.prefetch_scheme,
+    config.replacement_policy,
+  )
 
 def run(commands):
   # Config for L1 I/D, L2 (Fixed)
@@ -113,14 +125,18 @@ def run(commands):
 
   # TODO(totorody): Iterates variable configs to config_L3.
   # Config for L3 (Dynamic)
+  raw_config_L3 = raw_configs_L3[0]
   config_L3 = CacheConfig(
-    C=L3_CACHE_SIZE, L=BLOCK_SIZE, K=16, N=2048,
+    C=raw_config_L3['C'],
+    L=raw_config_L3['L'],
+    K=raw_config_L3['K'],
+    N=raw_config_L3['N'],
     BIT_SIZE=constants.BIT_SIZE,
     input_label=commands.input_file_label,
     HIT_TIME=32,
     MISS_PENALTY=120,
-    prefetch_scheme=constants.PREFETCH_SCHEME_TYPE['NONE'],
-    replacement_policy=constants.REPLACEMENT_POLICY_TYPE['LFU'],
+    prefetch_scheme=raw_config_L3['PREFETCH'],
+    replacement_policy=raw_config_L3['REPLACEMENT'],
   )
 
   input_file = constants.INPUT_FOLDER_PATH + commands.input_file_label
@@ -139,7 +155,7 @@ def run(commands):
   cache_L1_data.set_low_cache(cache_L2)
   cache_L2.set_low_cache(cache_L3)
 
-  print('Start to run caching')
+  print('Start to run caching...')
   index = 0
   for trace in traces:
     if index % 10000 == 0:
@@ -152,29 +168,18 @@ def run(commands):
     else:
       cache_L1_data.access(trace)
 
-  print('Caching result')
-  print('L1 inst cache')
-  print('hit: [%d], data miss: [%d], inst_miss: [%d], write: [%d]' % (
-    cache_L1_inst.counts['hit'],
-    cache_L1_inst.counts['data_miss'],
-    cache_L1_inst.counts['inst_miss'],
-    cache_L1_inst.counts['write']))
-  print('L1 data cache')
-  print('hit: [%d], data miss: [%d], inst_miss: [%d], write: [%d]' % (
-    cache_L1_data.counts['hit'],
-    cache_L1_data.counts['data_miss'],
-    cache_L1_data.counts['inst_miss'],
-    cache_L1_data.counts['write']))
-  print('L2 cache')
-  print('hit: [%d], data miss: [%d], inst_miss: [%d], write: [%d]' % (
-    cache_L2.counts['hit'],
-    cache_L2.counts['data_miss'],
-    cache_L2.counts['inst_miss'],
-    cache_L2.counts['write']))
-  print('L3 cache')
-  print('hit: [%d], data miss: [%d], inst_miss: [%d], write: [%d]' % (
-    cache_L3.counts['hit'],
-    cache_L3.counts['data_miss'],
-    cache_L3.counts['inst_miss'],
-    cache_L3.counts['write']))
-  print('END')
+  print('Prints cache simulation results...')
+  inst_result = cache_L1_inst.get_result()
+  data_result = cache_L2_data.get_result()
+
+  output_file_inst = constants.OUTPUT_FOLDER_PATH \
+      + populate_output_file_label(config_L1_inst)
+  output_file_data = constants.OUTPUT_FOLDER_PATH \
+      + populate_output_file_label(config_L1_data)
+  with open(output_file_inst) as csv_file:
+    csv_manager = CsvManager(csv_file, inst_result.keys())
+    csv_manager.write_row(inst_result)
+
+  with open(output_file_data) as csv_file:
+    csv_manager = CsvManager(csv_file, data_result.keys())
+    csv_manager.write_row(data_result)

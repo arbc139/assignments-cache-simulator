@@ -26,7 +26,7 @@ class Cache:
       'hit': 0,
       'data_miss': 0,
       'inst_miss': 0,
-      'write': 0,
+      'write_miss': 0,
     }
     self.LRU_count = np.array([
       [0 for j in range(config.K)] for i in range(config.N)
@@ -106,9 +106,48 @@ class Cache:
     elif trace['type'] == constants.ACCESS_TYPE['DATA_READ']:
       self.counts['data_miss'] += 1
     elif trace['type'] == constants.ACCESS_TYPE['DATA_WRITE']:
-      self.counts['write'] += 1
+      self.counts['write_miss'] += 1
 
     if self.low_cache:
       return self.low_cache.access(trace)
 
     return False
+
+  def get_amat(self):
+    total_count = self.counts['hit'] + self.counts['inst_miss'] \
+        + self.counts['data_miss'] + self.counts['write_miss']
+    inst_miss_ratio = self.counts['inst_miss'] / total_count
+    data_miss_ratio = self.counts['data_miss'] / total_count
+    write_miss_ratio = self.counts['write_miss'] / total_count
+
+    miss_panelty = None
+    if not self.low_cache:
+      miss_panelty = self.config.MISS_PANELTY
+    else:
+      miss_panelty = self.low_cache.get_amat()
+
+    return self.config.HIT_TIME \
+        + miss_panelty * (inst_miss_ratio + data_miss_ratio + write_miss_ratio)
+
+  def get_result(self):
+    results = {}
+    results['Input'] = self.config.input_label
+    results['Cache-Capacity'] = humanfriendly.format_size(self.config.C,
+                                                          binary=True)
+    results['L'] = humanfriendly.format_size(self.config.L, binary=True)
+    results['K'] = self.config.K
+    results['N'] = self.config.N
+    results['Prefetch'] = self.config.prefetch_scheme
+    results['Replacement'] = self.config.replacement_policy
+    total_count = self.counts['hit'] + self.counts['inst_miss'] \
+        + self.counts['data_miss'] + self.counts['write_miss']
+    results['Hit-Ratio'] = self.counts['hit'] / total_count
+    results['Inst-Miss-Ratio'] = self.counts['inst_miss'] / total_count
+    results['Data-Read-Miss-Ratio'] = self.counts['data_miss'] / total_count
+    results['Data-Write-Miss-Ratio'] = self.counts['write_miss'] / total_count
+    results['AMAT'] = self.get_amat()
+    results['Hit-Count'] = self.counts['hit']
+    results['Inst-Miss-Count'] = self.counts['inst_miss']
+    results['Data-Read-Miss-Count'] = self.counts['data_miss']
+    results['Data-Write-Miss-Count'] = self.counts['write_miss']
+    results['Access-Count'] = total_count
