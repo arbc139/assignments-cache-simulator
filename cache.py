@@ -65,6 +65,8 @@ class Cache:
       self.prefetcher_inst = Prefetcher(constants.PREFETCHER_TYPE['STREAM_BUFFER'])
       self.prefetcher_data = Prefetcher(constants.PREFETCHER_TYPE['WRITE_BUFFER'])
       return
+    else
+      raise RuntimeError('Wrong prefetcher types...')
 
   def set_low_cache(self, cache):
     self.low_cache = cache
