@@ -8,7 +8,7 @@ class Prefetcher():
     self.buffer = set()
 
   def check(self, access_type, address):
-    if self.prefetcher_type == constants.PREFETCHER_TYPE['INST']:
+    if self.prefetcher_type == constants.PREFETCHER_TYPE['STREAM_BUFFER']:
       if access_type != constants.ACCESS_TYPE['INST_READ']:
         return False
     elif self.prefetcher_type == constants.PREFETCHER_TYPE['DATA']:
@@ -25,7 +25,7 @@ class Prefetcher():
   def prefetch(self, address):
     self.buffer = set()
     int_address = trace_parser.parse_bin_address_to_int(address)
-    if self.prefetcher_type == constants.PREFETCHER_TYPE['INST']:
+    if self.prefetcher_type == constants.PREFETCHER_TYPE['STREAM_BUFFER']:
       self.buffer = set(range(
         int_address,
         int_address + constants.INST_PREFETCH_AMOUNT,

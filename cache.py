@@ -48,14 +48,14 @@ class Cache:
     self.prefetcher_data = None
     if self.config.prefetch_scheme == constants.PREFETCH_SCHEME_TYPE['NONE']:
       return
-    elif self.config.prefetch_scheme == constants.PREFETCH_SCHEME_TYPE['INST']:
-      self.prefetcher_inst = Prefetcher(constants.PREFETCHER_TYPE['INST'])
+    elif self.config.prefetch_scheme == constants.PREFETCH_SCHEME_TYPE['INST_ONLY']:
+      self.prefetcher_inst = Prefetcher(constants.PREFETCHER_TYPE['STREAM_BUFFER'])
       return
-    elif self.config.prefetch_scheme == constants.PREFETCH_SCHEME_TYPE['DATA']:
+    elif self.config.prefetch_scheme == constants.PREFETCH_SCHEME_TYPE['DATA_ONLY']:
       self.prefetcher_data = Prefetcher(constants.PREFETCHER_TYPE['DATA'])
       return
-    elif self.config.prefetch_scheme == constants.PREFETCH_SCHEME_TYPE['INST_DATA']:
-      self.prefetcher_inst = Prefetcher(constants.PREFETCHER_TYPE['INST'])
+    elif self.config.prefetch_scheme == constants.PREFETCH_SCHEME_TYPE['INST_DATA_BOTH']:
+      self.prefetcher_inst = Prefetcher(constants.PREFETCHER_TYPE['STREAM_BUFFER'])
       self.prefetcher_data = Prefetcher(constants.PREFETCHER_TYPE['DATA'])
       return
 
