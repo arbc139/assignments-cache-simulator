@@ -69,7 +69,7 @@ def populate_output_file_label(config):
     config.N,
     constants.get_prefetcher_type_label(config.inst_prefetcher),
     constants.get_prefetcher_type_label(config.data_prefetcher),
-    config.replacement_policy,
+    constants.get_replacement_policy_label(config.replacement_policy),
   )
 
 def run(commands):
