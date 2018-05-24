@@ -168,8 +168,10 @@ def run(commands):
         cache_L1_data.access(trace)
 
     print('Prints cache simulation results...')
-    inst_result = cache_L1_inst.get_result('Inst')
-    data_result = cache_L1_data.get_result('Data')
+    inst_result = cache_L1_inst.get_result('L1-Inst')
+    data_result = cache_L1_data.get_result('L1-Data')
+    L2_result = cache_L2.get_result('L2')
+    L3_result = cache_L3.get_result('L3')
 
     output_file = constants.OUTPUT_FOLDER_PATH \
         + populate_output_file_label(config_L3)
@@ -177,3 +179,5 @@ def run(commands):
       csv_manager = CsvManager(csv_file, inst_result.keys())
       csv_manager.write_row(inst_result)
       csv_manager.write_row(data_result)
+      csv_manager.write_row(L2_result)
+      csv_manager.write_row(L3_result)
