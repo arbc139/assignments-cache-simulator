@@ -23,8 +23,7 @@ PREFETCH_SCHEME_TYPE = {
 }
 
 # Prefetches instructions 512 inst addresses...
-INST_PREFETCH_AMOUNT = 512
-
+STREAM_BUFFER_PREFETCH_AMOUNT = 512
 PREFETCHER_TYPE = {
   'STREAM_BUFFER': 0,
   'DATA': 1,

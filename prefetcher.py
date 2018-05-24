@@ -28,7 +28,7 @@ class Prefetcher():
     if self.prefetcher_type == constants.PREFETCHER_TYPE['STREAM_BUFFER']:
       self.buffer = set(range(
         int_address,
-        int_address + constants.INST_PREFETCH_AMOUNT,
+        int_address + constants.STREAM_BUFFER_PREFETCH_AMOUNT,
       ))
     elif self.prefetcher_type == constants.PREFETCHER_TYPE['DATA']:
       # TODO(totorody): Implements prefeteches 'DATA' prefetcher
