@@ -26,8 +26,10 @@ class Prefetcher():
     self.buffer = set()
     int_address = trace_parser.parse_bin_address_to_int(address)
     if self.prefetcher_type == constants.PREFETCHER_TYPE['INST']:
-      for i in range(1, constants.INST_PREFETCH_AMOUNT + 1):
-        self.prefetch_inst_buffer.add(int_address + i)
+      self.buffer = set(range(
+        int_address,
+        int_address + constants.INST_PREFETCH_AMOUNT,
+      ))
     elif self.prefetcher_type == constants.PREFETCHER_TYPE['DATA']:
       # TODO(totorody): Implements prefeteches 'DATA' prefetcher
       None
