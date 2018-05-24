@@ -174,8 +174,11 @@ class Cache:
     results['L'] = humanfriendly.format_size(self.config.L, binary=True)
     results['K'] = self.config.K
     results['N'] = self.config.N
-    results['Prefetch'] = constants.get_prefetch_scheme_label(
-      self.config.prefetch_scheme
+    results['Inst-Prefetcher'] = constants.get_prefetcher_type_label(
+      self.config.inst_prefetch_scheme
+    )
+    results['Data-Prefetcher'] = constants.get_prefetcher_type_label(
+      self.config.data_prefetch_scheme
     )
     results['Replacement'] = constants.get_replacement_policy_label(
       self.config.replacement_policy

@@ -61,13 +61,14 @@ L3_CACHE_SIZE = '2MB'
 BLOCK_SIZE = '64B'
 
 def populate_output_file_label(config):
-  return '%s_(C_%s)_(L_%s)_(K_%s)_(N_%s)_(pre_%s)_(rep_%s)_results.csv' % (
+  return '%s_(C_%s)_(L_%s)_(K_%s)_(N_%s)_(PreInst_%s)_(PreData_%s)_(Rep_%s)_results.csv' % (
     config.input_label,
     config.C,
     config.L,
     config.K,
     config.N,
-    config.prefetch_scheme,
+    constants.get_prefetcher_type_label(config.inst_prefetch_scheme),
+    constants.get_prefetcher_type_label(config.data_prefetch_scheme),
     config.replacement_policy,
   )
 
@@ -104,7 +105,8 @@ def run(commands):
       'L': BLOCK_SIZE,
       'K': raw_config['K'],
       'N': raw_config['N'],
-      'PREFETCH': raw_config['PREFETCH'],
+      'INST_PREFETCHER': raw_config['INST_PREFETCHER'],
+      'DATA_PREFETCHER': raw_config['DATA_PREFETCHER'],
       'REPLACEMENT': raw_config['REPLACEMENT'],
     }
     for raw_config in cartesian_dict_product(raw_configs_dicts_L3)

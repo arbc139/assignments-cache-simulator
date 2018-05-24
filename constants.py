@@ -23,9 +23,9 @@ PREFETCHER_TYPE = {
   'WRITE_BUFFER': 2,
 }
 
-def get_prefetch_scheme_label(prefetch_scheme_type_value):
-  for key, value in PREFETCH_SCHEME_TYPE.items():
-    if value == prefetch_scheme_type_value:
+def get_prefetcher_type_label(prefetcher_type_value):
+  for key, value in PREFETCHER_TYPE.items():
+    if value == prefetcher_type_value:
       return key
 
 # Cache replacement scheme types
