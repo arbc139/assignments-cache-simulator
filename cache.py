@@ -44,6 +44,8 @@ class Cache:
     self.low_cache = None
 
   def set_prefetchers(self):
+    self.prefetcher_inst = None
+    self.prefetcher_data = None
     if self.config.prefetch_scheme == constants.PREFETCH_SCHEME_TYPE['NONE']:
       return
     elif self.config.prefetch_scheme == constants.PREFETCH_SCHEME_TYPE['INST']:

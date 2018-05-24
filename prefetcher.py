@@ -3,8 +3,8 @@ import constants
 import trace_parser
 
 class Prefetcher():
-  def __init__(self, prefetecher_type):
-    self.type = prefetcher_type
+  def __init__(self, prefetcher_type):
+    self.prefetcher_type = prefetcher_type
     self.buffer = set()
 
   def check(self, access_type, address):
@@ -19,7 +19,7 @@ class Prefetcher():
       raise RuntimeError('Wrong Prefetcher Type...')
     int_address = trace_parser.parse_bin_address_to_int(address)
     if int_address in self.buffer:
-      print('Find in prefetch inst buffer!')
+      print('Find in prefetch buffer!')
     return int_address in self.buffer
 
   def prefetch(self, address):
