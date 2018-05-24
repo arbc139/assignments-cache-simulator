@@ -137,10 +137,10 @@ def run(commands):
       input_label=commands.input_file_label,
       HIT_TIME=32,
       MISS_PENALTY=120,
-      inst_prefetcher=constants.PREFETCHER_TYPE['STREAM_BUFFER'],
-      # inst_prefetcher=constants.PREFETCHER_TYPE[raw_config_L3['INST_PREFETCHER']],
-      data_prefetcher=constants.PREFETCHER_TYPE['WRITE_BUFFER'],
-      # inst_prefetcher=constants.PREFETCHER_TYPE[raw_config_L3['DATA_PREFETCHER']],
+      # inst_prefetcher=constants.PREFETCHER_TYPE['STREAM_BUFFER'],
+      inst_prefetcher=constants.PREFETCHER_TYPE[raw_config_L3['INST_PREFETCHER']],
+      # data_prefetcher=constants.PREFETCHER_TYPE['WRITE_BUFFER'],
+      data_prefetcher=constants.PREFETCHER_TYPE[raw_config_L3['DATA_PREFETCHER']],
       replacement_policy=constants.REPLACEMENT_POLICY_TYPE[raw_config_L3['REPLACEMENT']],
     )
 
@@ -172,7 +172,7 @@ def run(commands):
     data_result = cache_L1_data.get_result('Data')
 
     output_file = constants.OUTPUT_FOLDER_PATH \
-        + populate_output_file_label(config_L1_inst)
+        + populate_output_file_label(config_L3)
     with open(output_file, 'w+') as csv_file:
       csv_manager = CsvManager(csv_file, inst_result.keys())
       csv_manager.write_row(inst_result)
