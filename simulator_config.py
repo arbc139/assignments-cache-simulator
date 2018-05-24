@@ -2,6 +2,8 @@
 import humanfriendly
 import math
 
+import constants
+
 class SimulatorConfig:
   def __init__(self, C, L, K, N, BIT_SIZE, input_label):
     self.C = int(humanfriendly.parse_size(C, binary=True))
@@ -41,7 +43,9 @@ class SimulatorConfig:
 
 class CacheConfig(SimulatorConfig):
   def __init__(self, C, L, K, N, BIT_SIZE, input_label, HIT_TIME, MISS_PENALTY,
-               inst_prefetch_scheme, data_prefetch_scheme, replacement_policy):
+               inst_prefetch_scheme=constants.PREFETCHER_TYPE['NONE'],
+               data_prefetch_scheme=constants.PREFETCHER_TYPE['NONE'],
+               replacement_policy=constants.REPLACEMENT_POLICY_TYPE['LRU']):
     SimulatorConfig.__init__(self, C, L, K, N, BIT_SIZE, input_label)
     self.HIT_TIME = HIT_TIME
     self.MISS_PENALTY = MISS_PENALTY

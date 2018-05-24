@@ -79,8 +79,6 @@ def run(commands):
     input_label=commands.input_file_label,
     HIT_TIME=4,
     MISS_PENALTY=16,
-    prefetch_scheme=constants.PREFETCH_SCHEME_TYPE['NONE'],
-    replacement_policy=constants.REPLACEMENT_POLICY_TYPE['LRU'],
   )
   config_L1_data = CacheConfig(
     C=L1_CACHE_SIZE, L=BLOCK_SIZE, K=1, N=512,
@@ -88,8 +86,6 @@ def run(commands):
     input_label=commands.input_file_label,
     HIT_TIME=4,
     MISS_PENALTY=16,
-    prefetch_scheme=constants.PREFETCH_SCHEME_TYPE['NONE'],
-    replacement_policy=constants.REPLACEMENT_POLICY_TYPE['LRU'],
   )
   config_L2 = CacheConfig(
     C=L2_CACHE_SIZE, L=BLOCK_SIZE, K=8, N=512,
@@ -97,8 +93,6 @@ def run(commands):
     input_label=commands.input_file_label,
     HIT_TIME=16,
     MISS_PENALTY=32,
-    prefetch_scheme=constants.PREFETCH_SCHEME_TYPE['NONE'],
-    replacement_policy=constants.REPLACEMENT_POLICY_TYPE['LRU'],
   )
 
   raw_configs_dicts_L3 = {}
