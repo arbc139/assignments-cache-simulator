@@ -40,8 +40,8 @@ class Cache:
     self.cachelines = [
       [CacheLine(0, False) for j in range(config.K)] for i in range(config.N)
     ]
-    self.prefetcher_inst = Prefetcher(self.config.inst_prefetch_scheme)
-    self.prefetcher_data = Prefetcher(self.config.data_prefetch_scheme)
+    self.prefetcher_inst = Prefetcher(self.config.inst_prefetcher)
+    self.prefetcher_data = Prefetcher(self.config.data_prefetcher)
     self.low_cache = None
 
   def set_low_cache(self, cache):
@@ -175,10 +175,10 @@ class Cache:
     results['K'] = self.config.K
     results['N'] = self.config.N
     results['Inst-Prefetcher'] = constants.get_prefetcher_type_label(
-      self.config.inst_prefetch_scheme
+      self.config.inst_prefetcher
     )
     results['Data-Prefetcher'] = constants.get_prefetcher_type_label(
-      self.config.data_prefetch_scheme
+      self.config.data_prefetcher
     )
     results['Replacement'] = constants.get_replacement_policy_label(
       self.config.replacement_policy

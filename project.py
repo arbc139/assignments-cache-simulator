@@ -131,10 +131,10 @@ def run(commands):
     input_label=commands.input_file_label,
     HIT_TIME=32,
     MISS_PENALTY=120,
-    inst_prefetch_scheme=constants.PREFETCHER_TYPE['STREAM_BUFFER'],
-    # inst_prefetch_scheme=constants.PREFETCHER_TYPE[raw_config_L3['INST_PREFETCHER']],
-    data_prefetch_scheme=constants.PREFETCHER_TYPE['WRITE_BUFFER'],
-    # inst_prefetch_scheme=constants.PREFETCHER_TYPE[raw_config_L3['DATA_PREFETCHER']],
+    inst_prefetcher=constants.PREFETCHER_TYPE['STREAM_BUFFER'],
+    # inst_prefetcher=constants.PREFETCHER_TYPE[raw_config_L3['INST_PREFETCHER']],
+    data_prefetcher=constants.PREFETCHER_TYPE['WRITE_BUFFER'],
+    # inst_prefetcher=constants.PREFETCHER_TYPE[raw_config_L3['DATA_PREFETCHER']],
     replacement_policy=constants.REPLACEMENT_POLICY_TYPE[raw_config_L3['REPLACEMENT']],
   )
 
