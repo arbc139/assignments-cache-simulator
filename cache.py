@@ -51,12 +51,12 @@ class Cache:
     elif self.config.prefetch_scheme == constants.PREFETCH_SCHEME_TYPE['INST_ONLY']:
       self.prefetcher_inst = Prefetcher(constants.PREFETCHER_TYPE['STREAM_BUFFER'])
       return
-    elif self.config.prefetch_scheme == constants.PREFETCH_SCHEME_TYPE['DATA_ONLY']:
-      self.prefetcher_data = Prefetcher(constants.PREFETCHER_TYPE['DATA'])
+    elif self.config.prefetch_scheme == constants.PREFETCH_SCHEME_TYPE['DATA_ONLY_STREAM_BUFFER']:
+      self.prefetcher_data = Prefetcher(constants.PREFETCHER_TYPE['STREAM_BUFFER'])
       return
-    elif self.config.prefetch_scheme == constants.PREFETCH_SCHEME_TYPE['INST_DATA_BOTH']:
+    elif self.config.prefetch_scheme == constants.PREFETCH_SCHEME_TYPE['INST_DATA_BOTH_STREAM_BUFFER']:
       self.prefetcher_inst = Prefetcher(constants.PREFETCHER_TYPE['STREAM_BUFFER'])
-      self.prefetcher_data = Prefetcher(constants.PREFETCHER_TYPE['DATA'])
+      self.prefetcher_data = Prefetcher(constants.PREFETCHER_TYPE['STREAM_BUFFER'])
       return
 
   def set_low_cache(self, cache):
