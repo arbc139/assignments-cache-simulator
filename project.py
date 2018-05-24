@@ -67,12 +67,18 @@ def populate_output_file_label(config):
     config.L,
     config.K,
     config.N,
-    constants.get_prefetcher_type_label(config.inst_prefetch_scheme),
-    constants.get_prefetcher_type_label(config.data_prefetch_scheme),
+    constants.get_prefetcher_type_label(config.inst_prefetcher),
+    constants.get_prefetcher_type_label(config.data_prefetcher),
     config.replacement_policy,
   )
 
 def run(commands):
+  input_file = constants.INPUT_FOLDER_PATH + commands.input_file_label
+  # Parse trace file to programmable.
+  traces = []
+  with open(input_file, 'r') as trace_file:
+    traces = trace_parser.parse(trace_file, constants.BIT_SIZE)
+
   # Config for L1 I/D, L2 (Fixed)
   config_L1_inst = CacheConfig(
     C=L1_CACHE_SIZE, L=BLOCK_SIZE, K=1, N=512,
@@ -118,62 +124,56 @@ def run(commands):
     })
   ]
   validate_raw_configs(raw_configs_L3)
+  del raw_configs_dicts_L3
 
-  # TODO(totorody): Iterates variable configs to config_L3.
-  # Config for L3 (Dynamic)
-  raw_config_L3 = raw_configs_L3[0]
-  config_L3 = CacheConfig(
-    C=raw_config_L3['C'],
-    L=raw_config_L3['L'],
-    K=raw_config_L3['K'],
-    N=raw_config_L3['N'],
-    BIT_SIZE=constants.BIT_SIZE,
-    input_label=commands.input_file_label,
-    HIT_TIME=32,
-    MISS_PENALTY=120,
-    inst_prefetcher=constants.PREFETCHER_TYPE['STREAM_BUFFER'],
-    # inst_prefetcher=constants.PREFETCHER_TYPE[raw_config_L3['INST_PREFETCHER']],
-    data_prefetcher=constants.PREFETCHER_TYPE['WRITE_BUFFER'],
-    # inst_prefetcher=constants.PREFETCHER_TYPE[raw_config_L3['DATA_PREFETCHER']],
-    replacement_policy=constants.REPLACEMENT_POLICY_TYPE[raw_config_L3['REPLACEMENT']],
-  )
+  for raw_config_L3 in raw_configs_L3:
+    # Config for L3 (Dynamic)
+    config_L3 = CacheConfig(
+      C=raw_config_L3['C'],
+      L=raw_config_L3['L'],
+      K=raw_config_L3['K'],
+      N=raw_config_L3['N'],
+      BIT_SIZE=constants.BIT_SIZE,
+      input_label=commands.input_file_label,
+      HIT_TIME=32,
+      MISS_PENALTY=120,
+      inst_prefetcher=constants.PREFETCHER_TYPE['STREAM_BUFFER'],
+      # inst_prefetcher=constants.PREFETCHER_TYPE[raw_config_L3['INST_PREFETCHER']],
+      data_prefetcher=constants.PREFETCHER_TYPE['WRITE_BUFFER'],
+      # inst_prefetcher=constants.PREFETCHER_TYPE[raw_config_L3['DATA_PREFETCHER']],
+      replacement_policy=constants.REPLACEMENT_POLICY_TYPE[raw_config_L3['REPLACEMENT']],
+    )
 
-  input_file = constants.INPUT_FOLDER_PATH + commands.input_file_label
-  # Parse trace file to programmable.
-  traces = []
-  with open(input_file, 'r') as trace_file:
-    traces = trace_parser.parse(trace_file, constants.BIT_SIZE)
+    # TODO(totorody): Implements to run caches
+    cache_L1_inst = Cache(config_L1_inst)
+    cache_L1_data = Cache(config_L1_data)
+    cache_L2 = Cache(config_L2)
+    cache_L3 = Cache(config_L3)
 
-  # TODO(totorody): Implements to run caches
-  cache_L1_inst = Cache(config_L1_inst)
-  cache_L1_data = Cache(config_L1_data)
-  cache_L2 = Cache(config_L2)
-  cache_L3 = Cache(config_L3)
+    cache_L1_inst.set_low_cache(cache_L2)
+    cache_L1_data.set_low_cache(cache_L2)
+    cache_L2.set_low_cache(cache_L3)
 
-  cache_L1_inst.set_low_cache(cache_L2)
-  cache_L1_data.set_low_cache(cache_L2)
-  cache_L2.set_low_cache(cache_L3)
+    print('Start to run caching...')
+    index = 0
+    for trace in traces:
+      if index % 10000 == 0:
+        print('trace #:', index)
+      index += 1
+      if trace['type'] not in constants.ACCESS_TYPE.values():
+        continue
+      if trace['type'] == constants.ACCESS_TYPE['INST_READ']:
+        cache_L1_inst.access(trace)
+      else:
+        cache_L1_data.access(trace)
 
-  print('Start to run caching...')
-  index = 0
-  for trace in traces:
-    if index % 10000 == 0:
-      print('trace #:', index)
-    index += 1
-    if trace['type'] not in constants.ACCESS_TYPE.values():
-      continue
-    if trace['type'] == constants.ACCESS_TYPE['INST_READ']:
-      cache_L1_inst.access(trace)
-    else:
-      cache_L1_data.access(trace)
+    print('Prints cache simulation results...')
+    inst_result = cache_L1_inst.get_result('Inst')
+    data_result = cache_L1_data.get_result('Data')
 
-  print('Prints cache simulation results...')
-  inst_result = cache_L1_inst.get_result('Inst')
-  data_result = cache_L1_data.get_result('Data')
-
-  output_file = constants.OUTPUT_FOLDER_PATH \
-      + populate_output_file_label(config_L1_inst)
-  with open(output_file, 'w+') as csv_file:
-    csv_manager = CsvManager(csv_file, inst_result.keys())
-    csv_manager.write_row(inst_result)
-    csv_manager.write_row(data_result)
+    output_file = constants.OUTPUT_FOLDER_PATH \
+        + populate_output_file_label(config_L1_inst)
+    with open(output_file, 'w+') as csv_file:
+      csv_manager = CsvManager(csv_file, inst_result.keys())
+      csv_manager.write_row(inst_result)
+      csv_manager.write_row(data_result)
