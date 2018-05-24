@@ -1,11 +1,7 @@
 {
   "K": ["1", "2", "4", "8", "16"],
   "N": ["32768", "16384", "8192", "4096", "2048"],
-  "PREFETCH": [
-    "NONE",
-    "INST_ONLY",
-    "DATA_ONLY_STREAM_BUFFER",
-    "INST_DATA_BOTH_STREAM_BUFFER"
-  ],
+  "INST_PREFETCHER": ["NONE", "STREAM_BUFFER"],
+  "DATA_PREFETCHER": ["NONE", "STREAM_BUFFER", "WRITE_BUFFER"],
   "REPLACEMENT": ["LRU", "MRU", "RANDOM", "LFU"]
 }

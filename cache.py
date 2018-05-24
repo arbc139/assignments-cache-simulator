@@ -40,75 +40,24 @@ class Cache:
     self.cachelines = [
       [CacheLine(0, False) for j in range(config.K)] for i in range(config.N)
     ]
-    self.set_prefetchers()
+    self.prefetcher_inst = Prefetcher(self.config.inst_prefetch_scheme)
+    self.prefetcher_data = Prefetcher(self.config.data_prefetch_scheme)
     self.low_cache = None
-
-  def set_prefetchers(self):
-    self.prefetcher_inst = None
-    self.prefetcher_data = None
-    if self.config.prefetch_scheme == constants.PREFETCH_SCHEME_TYPE['NONE']:
-      return
-    elif self.config.prefetch_scheme == constants.PREFETCH_SCHEME_TYPE['INST_ONLY']:
-      self.prefetcher_inst = Prefetcher(constants.PREFETCHER_TYPE['STREAM_BUFFER'])
-      return
-    elif self.config.prefetch_scheme == constants.PREFETCH_SCHEME_TYPE['DATA_ONLY_STREAM_BUFFER']:
-      self.prefetcher_data = Prefetcher(constants.PREFETCHER_TYPE['STREAM_BUFFER'])
-      return
-    elif self.config.prefetch_scheme == constants.PREFETCH_SCHEME_TYPE['INST_DATA_BOTH_STREAM_BUFFER']:
-      self.prefetcher_inst = Prefetcher(constants.PREFETCHER_TYPE['STREAM_BUFFER'])
-      self.prefetcher_data = Prefetcher(constants.PREFETCHER_TYPE['STREAM_BUFFER'])
-      return
-    elif self.config.prefetch_scheme == constants.PREFETCH_SCHEME_TYPE['DATA_ONLY_WRITE_BUFFER']:
-      self.prefetcher_data = Prefetcher(constants.PREFETCHER_TYPE['WRITE_BUFFER'])
-      return
-    elif self.config.prefetch_scheme == constants.PREFETCH_SCHEME_TYPE['INST_DATA_BOTH_WRITE_BUFFER']:
-      self.prefetcher_inst = Prefetcher(constants.PREFETCHER_TYPE['STREAM_BUFFER'])
-      self.prefetcher_data = Prefetcher(constants.PREFETCHER_TYPE['WRITE_BUFFER'])
-      return
-    else
-      raise RuntimeError('Wrong prefetcher types...')
 
   def set_low_cache(self, cache):
     self.low_cache = cache
 
   def check_prefetchers(self, access_type, address):
-    if not self.prefetcher_inst and not self.prefetcher_data:
-      # Prefetch check 'NONE'
-      return False
-    elif self.prefetcher_inst and not self.prefetcher_data:
-      # Prefetch check 'INST'
-      return self.prefetcher_inst.check(access_type, address)
-    elif not self.prefetcher_inst and self.prefetcher_data:
-      # Prefetch check 'DATA'
-      return self.prefetcher_data.check(access_type, address)
+    if access_type == constants.ACCESS_TYPE['INST_READ']:
+      return self.prefetcher_inst.check(address)
     else:
-      # Prefetch check 'INST_DATA'
-      return self.prefetcher_inst.check(access_type, address) or \
-          self.prefetcher_data.check(access_type, address)
+      return self.prefetcher_data.check(address)
 
   def prefetch(self, access_type, address):
-    if not self.prefetcher_inst and not self.prefetcher_data:
-      # No Prefetch
-      return
-    elif self.prefetcher_inst and not self.prefetcher_data:
-      # Prefetches INST prefetcher
-      if access_type == constants.ACCESS_TYPE['INST_READ']:
-        self.prefetcher_inst.prefetch(access_type, address)
-      return
-    elif not self.prefetcher_inst and self.prefetcher_data:
-      # Prefetches DATA prefetecher
-      if access_type == constants.ACCESS_TYPE['DATA_READ'] or \
-          access_type == constants.ACCESS_TYPE['DATA_WRITE']:
-        self.prefetcher_data.prefetch(access_type, address)
-      return
+    if access_type == constants.ACCESS_TYPE['INST_READ']:
+      self.prefetcher_inst.prefetch(access_type, address)
     else:
-      # Prefetches INST & DATA prefetchers
-      if access_type == constants.ACCESS_TYPE['INST_READ']:
-        self.prefetcher_inst.prefetch(access_type, address)
-      if access_type == constants.ACCESS_TYPE['DATA_READ'] or \
-          access_type == constants.ACCESS_TYPE['DATA_WRITE']:
-        self.prefetcher_data.prefetch(access_type, address)
-      return
+      self.prefetcher_data.prefetch(access_type, address)
 
   def select_victim(self, cache_index):
     victim_j = 0

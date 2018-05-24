@@ -41,9 +41,10 @@ class SimulatorConfig:
 
 class CacheConfig(SimulatorConfig):
   def __init__(self, C, L, K, N, BIT_SIZE, input_label, HIT_TIME, MISS_PENALTY,
-               prefetch_scheme, replacement_policy):
+               inst_prefetch_scheme, data_prefetch_scheme, replacement_policy):
     SimulatorConfig.__init__(self, C, L, K, N, BIT_SIZE, input_label)
     self.HIT_TIME = HIT_TIME
     self.MISS_PENALTY = MISS_PENALTY
-    self.prefetch_scheme = prefetch_scheme
+    self.inst_prefetch_scheme = inst_prefetch_scheme
+    self.data_prefetch_scheme = data_prefetch_scheme
     self.replacement_policy = replacement_policy
