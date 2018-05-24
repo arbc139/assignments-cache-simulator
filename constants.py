@@ -16,17 +16,21 @@ ACCESS_TYPE = {
 # Cache prefetch scheme types
 PREFETCH_SCHEME_TYPE = {
   'NONE': 0,
-  'INST_ONLY': 1,      # Instruction prefetch scheme
-  'DATA_ONLY_STREAM_BUFFER': 2,      # Data prefetch scheme
-  'INST_DATA_BOTH_STREAM_BUFFER': 3, # Instruction & Data prefetch scheme (both)
+  'INST_ONLY': 1,                     # STREAM_BUFFER Instruction prefetch scheme
+  'DATA_ONLY_STREAM_BUFFER': 2,       # STREAM_BUFFER Data prefetch scheme
+  'INST_DATA_BOTH_STREAM_BUFFER': 3,  # STREAM_BUFFER Instruction & STREAM_BUFFER Data prefetch scheme (both)
+  'DATA_ONLY_WRITE_BUFFER': 4,        # WRITE_BUFFER Data prefetch scheme
+  'INST_DATA_BOTH_WRITE_BUFFER': 5,   # STREAM_BUFFER Instruction & WRITE_BUFFER Data prefetch scheme
   # TODO(totorody): Implements other prefetch schemes...
 }
 
-# Prefetches instructions 512 inst addresses...
+# Prefetches 512 addresses on STREAM_BUFFER...
 STREAM_BUFFER_PREFETCH_AMOUNT = 512
+# Prefetches max 512 addresses on WRITE_BUFFER...
+MAX_WRITE_BUFFER_PREFETCH_AMOUNT = 512
 PREFETCHER_TYPE = {
   'STREAM_BUFFER': 0,
-  'DATA': 1,
+  'WRITE_BUFFER': 1,
 }
 
 def get_prefetch_scheme_label(prefetch_scheme_type_value):

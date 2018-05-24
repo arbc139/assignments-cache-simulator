@@ -79,26 +79,26 @@ class Cache:
 
   def prefetch(self, access_type, address):
     if not self.prefetcher_inst and not self.prefetcher_data:
-      # Prefetches 'NONE'
+      # No Prefetch
       return
     elif self.prefetcher_inst and not self.prefetcher_data:
-      # Prefetches 'INST'
+      # Prefetches INST prefetcher
       if access_type == constants.ACCESS_TYPE['INST_READ']:
-        self.prefetcher_inst.prefetch(address)
+        self.prefetcher_inst.prefetch(access_type, address)
       return
     elif not self.prefetcher_inst and self.prefetcher_data:
-      # Prefetches 'DATA'
+      # Prefetches DATA prefetecher
       if access_type == constants.ACCESS_TYPE['DATA_READ'] or \
           access_type == constants.ACCESS_TYPE['DATA_WRITE']:
-        self.prefetcher_data.prefetch(address)
+        self.prefetcher_data.prefetch(access_type, address)
       return
     else:
-      # Prefetches 'INST_DATA'
+      # Prefetches INST & DATA prefetchers
       if access_type == constants.ACCESS_TYPE['INST_READ']:
-        self.prefetcher_inst.prefetch(address)
+        self.prefetcher_inst.prefetch(access_type, address)
       if access_type == constants.ACCESS_TYPE['DATA_READ'] or \
           access_type == constants.ACCESS_TYPE['DATA_WRITE']:
-        self.prefetcher_data.prefetch(address)
+        self.prefetcher_data.prefetch(access_type, address)
       return
 
   def select_victim(self, cache_index):
