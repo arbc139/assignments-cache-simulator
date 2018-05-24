@@ -17,8 +17,8 @@ ACCESS_TYPE = {
 PREFETCH_SCHEME_TYPE = {
   'NONE': 0,
   'INST_ONLY': 1,      # Instruction prefetch scheme
-  'DATA_ONLY': 2,      # Data prefetch scheme
-  'INST_DATA_BOTH': 3, # Instruction & Data prefetch scheme (both)
+  'DATA_ONLY_STREAM_BUFFER': 2,      # Data prefetch scheme
+  'INST_DATA_BOTH_STREAM_BUFFER': 3, # Instruction & Data prefetch scheme (both)
   # TODO(totorody): Implements other prefetch schemes...
 }
 
